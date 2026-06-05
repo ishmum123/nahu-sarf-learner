@@ -50,92 +50,7 @@
     <div class="quiz" id="quiz-home"></div>
   </section>
 
-  <!-- ============ ISM VIEW ============ -->
-  <section class="view" id="view-ism">
-    <div class="fil-topbar">
-      <button class="back" id="ism-back">← কালিমার প্রকারে ফিরে যাও</button>
-    </div>
-    <header style="margin-bottom:8px">
-      <div class="eyebrow">أَقْسَامُ الِاسْم</div>
-      <div class="ornament"><span>✦</span></div>
-      <h1>ইসম-এর প্রকারভেদ</h1>
-      <p class="sub">একই ইসমকে নানা দৃষ্টিকোণ থেকে ভাগ করা যায় — সংখ্যা, লিঙ্গ, নির্দিষ্টতা, উৎপত্তি, ইʿরাব ও আরও।</p>
-    </header>
-
-    <div class="step-head">
-      <div class="step-count" id="ism-stepcount"></div>
-      <div class="step-bar"><i id="ism-stepfill"></i></div>
-      <div class="step-dots" id="ism-stepdots"></div>
-    </div>
-
-    <div id="ism-steps"></div>
-    <div id="ism-summary" class="fil-summary"></div>
-  </section>
-
-  <!-- ============ ISM → MUʿRAB DRILL-DOWN ============ -->
-  <section class="view" id="view-ism-murab">
-    <div class="fil-topbar">
-      <button class="back" id="murab-back">← ইসমের প্রকারভেদে ফিরে যাও</button>
-    </div>
-    <header style="margin-bottom:8px">
-      <div class="eyebrow">إِعْرَابُ الِاسْم</div>
-      <div class="ornament"><span>✦</span></div>
-      <h1>মুʿরাবের প্রকার — ইসমের ইʿরাব</h1>
-      <p class="sub">মুʿরাব ইসম বাক্যে ভূমিকা অনুযায়ী শেষ বদলায়। ধাপে ধাপে — অবস্থা, হরফে চিহ্ন ও অনুমিত চিহ্ন।</p>
-    </header>
-
-    <div class="step-head">
-      <div class="step-count" id="murab-stepcount"></div>
-      <div class="step-bar"><i id="murab-stepfill"></i></div>
-      <div class="step-dots" id="murab-stepdots"></div>
-    </div>
-
-    <div id="murab-steps"></div>
-    <div id="murab-summary" class="fil-summary"></div>
-  </section>
-
-  <!-- ============ FIL VIEW ============ -->
-  <section class="view" id="view-fil">
-    <div class="fil-topbar">
-      <button class="back" id="fil-back">← কালিমার প্রকারে ফিরে যাও</button>
-    </div>
-    <header style="margin-bottom:8px">
-      <div class="eyebrow">أَقْسَامُ الْفِعْل</div>
-      <div class="ornament"><span>✦</span></div>
-      <h1>ফি'ল-এর প্রকারভেদ</h1>
-    </header>
-
-    <div class="step-head">
-      <div class="step-count" id="fil-stepcount"></div>
-      <div class="step-bar"><i id="fil-stepfill"></i></div>
-      <div class="step-dots" id="fil-stepdots"></div>
-    </div>
-
-    <div id="fil-steps"></div>
-    <div id="fil-summary" class="fil-summary"></div>
-  </section>
-
-  <!-- ============ HARF VIEW ============ -->
-  <section class="view" id="view-harf">
-    <div class="fil-topbar">
-      <button class="back" id="harf-back">← কালিমার প্রকারে ফিরে যাও</button>
-    </div>
-    <header style="margin-bottom:8px">
-      <div class="eyebrow">أَقْسَامُ الْحَرْف</div>
-      <div class="ornament"><span>✦</span></div>
-      <h1>হরফ-এর প্রকারভেদ</h1>
-      <p class="sub">হরফ তার কাজ অনুযায়ী নানা দলে ভাগ। মনে রেখো — কিছু হরফ একাধিক দলেও থাকতে পারে।</p>
-    </header>
-
-    <div class="step-head">
-      <div class="step-count" id="harf-stepcount"></div>
-      <div class="step-bar"><i id="harf-stepfill"></i></div>
-      <div class="step-dots" id="harf-stepdots"></div>
-    </div>
-
-    <div id="harf-steps"></div>
-    <div id="harf-summary" class="fil-summary"></div>
-  </section>
+  <!-- stepper pages (ism, fil, harf, and all nested drill-downs) are generated here by nav.js → buildPages() -->
 
   <footer>
     <span class="ar">طَلَبُ الْعِلْمِ فَرِيضَةٌ</span>
@@ -144,45 +59,23 @@
 
 </div>
 
-<!-- ===== fil burger menu (global, outside views to avoid show/hide flash) ===== -->
-<button class="burger" id="fil-burger" aria-label="মেনু">☰</button>
-<div class="drawer-backdrop" id="fil-backdrop"></div>
-<aside class="drawer" id="fil-drawer">
-  <div class="drawer-head">ফি'লের প্রকারভেদ</div>
-  <div class="drawer-sub">যেকোনো ধাপে যেতে নাম বেছে নাও</div>
-  <nav id="fil-drawer-list"></nav>
-</aside>
-
-<button class="burger" id="harf-burger" aria-label="মেনু">☰</button>
-<div class="drawer-backdrop" id="harf-backdrop"></div>
-<aside class="drawer" id="harf-drawer">
-  <div class="drawer-head">হরফের প্রকারভেদ</div>
-  <div class="drawer-sub">যেকোনো দলে যেতে নাম বেছে নাও</div>
-  <nav id="harf-drawer-list"></nav>
-</aside>
-
-<button class="burger" id="ism-burger" aria-label="মেনু">☰</button>
-<div class="drawer-backdrop" id="ism-backdrop"></div>
-<aside class="drawer" id="ism-drawer">
-  <div class="drawer-head">ইসমের প্রকারভেদ</div>
-  <div class="drawer-sub">যেকোনো ধাপে যেতে নাম বেছে নাও</div>
-  <nav id="ism-drawer-list"></nav>
-</aside>
-
-<button class="burger" id="murab-burger" aria-label="মেনু">☰</button>
-<div class="drawer-backdrop" id="murab-backdrop"></div>
-<aside class="drawer" id="murab-drawer">
-  <div class="drawer-head">ইসমের ইʿরাব</div>
-  <div class="drawer-sub">যেকোনো ধাপে যেতে নাম বেছে নাও</div>
-  <nav id="murab-drawer-list"></nav>
+<!-- ===== shared chrome: one burger + drawer for whichever stepper page is active ===== -->
+<button class="burger" id="nav-burger" aria-label="মেনু">☰</button>
+<div class="drawer-backdrop" id="nav-backdrop"></div>
+<aside class="drawer" id="nav-drawer">
+  <div class="drawer-head" id="nav-drawer-head"></div>
+  <div class="drawer-sub" id="nav-drawer-sub"></div>
+  <nav id="nav-drawer-list"></nav>
 </aside>
 
 <script src="engine/quiz.js"></script>
 <script src="engine/stepper.js"></script>
+<script src="engine/nav.js"></script>
 <script src="data/ism.js"></script>
 <script src="data/fil.js"></script>
 <script src="data/harf.js"></script>
 <script src="data/murab.js"></script>
+<script src="data/murab-states.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

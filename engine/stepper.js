@@ -1,11 +1,13 @@
 // stepper.js — reusable stepper engine + bangla numerals (classic global script).
-// Provides: BN_NUM, bn, makeStepper. Calls makeQuiz/makeMultiQuiz/makeSentenceQuiz at runtime (load quiz.js first).
+// Provides: BN_NUM, bn, makeStepper. Calls makeQuiz/makeMultiQuiz/makeSentenceQuiz (load quiz.js first).
+// Breadcrumb, shared drawer/burger and view switching (show) live in nav.js — load nav.js before the data files.
+// makeStepper builds ONE page's steps + dots + recap into pre-existing #${prefix}-* nodes and returns { go, current }.
 
   const BN_NUM=['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
   const bn = n => String(n).split('').map(d=>BN_NUM[+d]).join('');
 
   function makeStepper(cfg){
-    const { prefix, steps, summaryTitle } = cfg;
+    const { prefix, steps, summaryTitle, onStep } = cfg;
     const host  = document.getElementById(`${prefix}-steps`);
     const dots  = document.getElementById(`${prefix}-stepdots`);
     const fill  = document.getElementById(`${prefix}-stepfill`);
@@ -61,25 +63,11 @@
         <button class="step-next" id="${prefix}-sum-home">🏠 কালিমায় ফিরে যাও</button>
       </div>`;
 
-    // build drawer (burger menu) list — sections + summary
-    const drawerList = document.getElementById(`${prefix}-drawer-list`);
-    drawerList.innerHTML = steps.map((s,i)=>
-      `<button class="drawer-item" data-go="${i}"><span class="di-kicker">${s.kicker}</span><span class="di-title">${s.title}</span></button>`
-    ).join('') + `<button class="drawer-item" data-go="${N}"><span class="di-kicker">✦ শেষ</span><span class="di-title">সব প্রকার — এক নজরে</span></button>`;
-    const drawerItems=[...drawerList.querySelectorAll('.drawer-item')];
-
-    const drawer=document.getElementById(`${prefix}-drawer`);
-    const backdrop=document.getElementById(`${prefix}-backdrop`);
-    function closeDrawer(){ drawer.classList.remove('open'); backdrop.classList.remove('open'); document.body.classList.remove('drawer-open'); }
-    document.getElementById(`${prefix}-burger`).addEventListener('click', ()=>{ drawer.classList.add('open'); backdrop.classList.add('open'); document.body.classList.add('drawer-open'); });
-    backdrop.addEventListener('click', closeDrawer);
-
     const stepEls=[...host.querySelectorAll('.step')];
     const dotEls=[...dots.querySelectorAll('.step-dot')];
     let cur=-1;
 
     function go(i){
-      drawerItems.forEach((el,idx)=>el.classList.toggle('active', idx===i));
       if(i>=N){
         stepEls.forEach(el=>el.classList.remove('active'));
         dotEls.forEach(el=>{ el.classList.remove('active'); el.classList.add('done'); });
@@ -87,6 +75,7 @@
         fill.style.width='100%';
         count.textContent='সম্পন্ন ✓';
         cur=N;
+        if(onStep) onStep(cur);
         window.scrollTo({ top:0, behavior:'smooth' });
         return;
       }
@@ -95,8 +84,9 @@
       cur=i;
       stepEls.forEach((el,idx)=>el.classList.toggle('active', idx===i));
       dotEls.forEach((el,idx)=>{ el.classList.toggle('active', idx===i); el.classList.toggle('done', idx<i); });
-      fill.style.width=(i/(N-1)*100)+'%';
+      fill.style.width = N>1 ? (i/(N-1)*100)+'%' : '100%';
       count.textContent=`ধাপ ${bn(i+1)} / ${bn(N)}`;
+      if(onStep) onStep(cur);
       window.scrollTo({ top:0, behavior:'smooth' });
     }
 
@@ -107,10 +97,9 @@
       else if(e.target.classList.contains('step-prev')) go(cur-1);
     });
     dots.addEventListener('click', e=>{ const b=e.target.closest('.step-dot'); if(b) go(+b.dataset.go); });
-    drawerList.addEventListener('click', e=>{ const b=e.target.closest('.drawer-item'); if(b){ go(+b.dataset.go); closeDrawer(); } });
     summary.addEventListener('click', e=>{ const r=e.target.closest('.recap-row'); if(r){ go(+r.dataset.go); } });
     summary.querySelector(`#${prefix}-sum-restart`).addEventListener('click', ()=>go(0));
-    summary.querySelector(`#${prefix}-sum-home`).addEventListener('click', ()=>show('view-home'));
+    summary.querySelector(`#${prefix}-sum-home`).addEventListener('click', ()=>show(null));
     go(0);
-    return go;
+    return { go, current:()=>cur };
   }

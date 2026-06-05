@@ -98,6 +98,18 @@
   }
   .back:hover { gap: 13px; color: var(--teal-deep); }
 
+  /* ---------- breadcrumb trail (nested page nav) ---------- */
+  .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 7px; margin-bottom: 6px; }
+  .crumb {
+    font-family: inherit; font-size: 0.84rem; font-weight: 600;
+    background: none; border: none; padding: 4px 1px; cursor: pointer;
+    color: var(--teal); transition: color .2s;
+  }
+  .crumb:hover { color: var(--teal-deep); text-decoration: underline; text-underline-offset: 3px; }
+  .crumb.cur { color: var(--ink); cursor: default; }
+  .crumb.cur:hover { text-decoration: none; }
+  .crumb-sep { color: var(--gold); font-size: 0.8rem; opacity: .8; }
+
   /* ---------- cards ---------- */
   .section-label {
     text-align: center;
@@ -274,7 +286,7 @@
     box-shadow:0 4px 14px -6px var(--shadow);
     transition:background .2s, transform .12s, opacity .2s;
   }
-  body.fil-active #fil-burger, body.harf-active #harf-burger, body.ism-active #ism-burger, body.murab-active #murab-burger { display:block; }
+  body.page-view #nav-burger { display:block; }
   .burger:hover { background:rgba(31,94,87,.08); transform:translateY(-1px); }
   /* hide burger while drawer is open so it doesn't cover the drawer heading */
   body.drawer-open .burger { opacity:0; pointer-events:none; }
