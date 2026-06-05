@@ -238,6 +238,23 @@
   .step-prev:disabled { opacity:.3; cursor:default; }
   .step-next { background: var(--teal); color: var(--parchment); margin-left:auto; }
   .step-next:hover { background: var(--teal-deep); transform: translateX(3px); }
+
+  /* ---------- fil summary (recap list) ---------- */
+  .fil-summary { display:none; }
+  .fil-summary.show { display:block; animation: fadeIn .45s ease; }
+  .recap-row {
+    background: linear-gradient(160deg,#fbf5e6,var(--parchment-deep));
+    border:1px solid rgba(181,138,60,.4); border-radius:14px;
+    padding:18px 20px; margin-bottom:14px; box-shadow:0 6px 18px -12px var(--shadow);
+  }
+  .recap-kicker { font-size:.75rem; letter-spacing:2px; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:11px; }
+  .recap-types { display:flex; flex-wrap:wrap; gap:10px; }
+  .recap-type {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(31,94,87,.06); border:1px solid rgba(31,94,87,.18);
+    border-radius:9px; padding:7px 12px; font-size:.9rem; color:var(--ink);
+  }
+  .recap-type .ar { font-family:'Amiri',serif; direction:rtl; color:var(--teal); font-size:1.15rem; }
   .choice {
     font-family: inherit;
     font-size: 1rem;
@@ -431,6 +448,7 @@
     </div>
 
     <div id="fil-steps"></div>
+    <div id="fil-summary" class="fil-summary"></div>
   </section>
 
   <footer>
@@ -902,13 +920,41 @@
       dots.appendChild(d);
     });
 
+    // build recap summary
+    const summary = document.getElementById('fil-summary');
+    summary.innerHTML = `
+      <div class="section-label" style="margin-top:6px">✦ সম্পন্ন ✦</div>
+      <h2 class="step-title">ফি'লের সব প্রকারভেদ — এক নজরে</h2>
+      <p class="sub" style="text-align:center;margin:6px 0 26px">মাশাআল্লাহ! তুমি সাতটি ধাপই শেষ করেছ।</p>
+      ${FIL_STEPS.map(s=>`
+        <div class="recap-row">
+          <div class="recap-kicker">${s.kicker}</div>
+          <div class="recap-types">
+            ${s.cards.map(c=>`<span class="recap-type"><span class="ar">${c.tag}</span> ${c.h3}</span>`).join('')}
+          </div>
+        </div>`).join('')}
+      <div class="step-nav" style="margin-top:26px">
+        <button class="step-prev" id="fil-sum-restart">↺ আবার শুরু</button>
+        <button class="step-next" id="fil-sum-home">🏠 কালিমায় ফিরে যাও</button>
+      </div>`;
+
     const stepEls=[...host.querySelectorAll('.step')];
     const dotEls=[...dots.querySelectorAll('.step-dot')];
     let cur=-1;
 
     function go(i){
-      if(i>=N){ show('view-home'); return; }
+      if(i>=N){
+        stepEls.forEach(el=>el.classList.remove('active'));
+        dotEls.forEach(el=>{ el.classList.remove('active'); el.classList.add('done'); });
+        summary.classList.add('show');
+        fill.style.width='100%';
+        count.textContent='সম্পন্ন ✓';
+        cur=N;
+        window.scrollTo({ top:0, behavior:'smooth' });
+        return;
+      }
       if(i<0) return;
+      summary.classList.remove('show');
       cur=i;
       stepEls.forEach((el,idx)=>el.classList.toggle('active', idx===i));
       dotEls.forEach((el,idx)=>{ el.classList.toggle('active', idx===i); el.classList.toggle('done', idx<i); });
@@ -922,6 +968,8 @@
       else if(e.target.classList.contains('step-prev')) go(cur-1);
     });
     dots.addEventListener('click', e=>{ const b=e.target.closest('.step-dot'); if(b) go(+b.dataset.go); });
+    summary.querySelector('#fil-sum-restart').addEventListener('click', ()=>go(0));
+    summary.querySelector('#fil-sum-home').addEventListener('click', ()=>show('view-home'));
     go(0);
     return go;
   }
