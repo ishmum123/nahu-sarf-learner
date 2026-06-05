@@ -12,10 +12,10 @@ into its **own nested stepper page**, as deep as the grammar goes.
 
 ```
 Home (kalimah quiz)
-  └─ ism ──▶ stepper page
-        └─ iʿrab: muʿrab ──▶ stepper page
-              └─ marfuʿ ──▶ stepper page
-                    └─ faʿil, naʾib, mubtada, khabar, …
+  ├─ ism  ──▶ stepper ──▶ muʿrab ──▶ marfuʿ · mansub · majrur
+  │                  └──▶ mushtaqq · ghayr-munsarif
+  ├─ fiʿl ──▶ stepper ──▶ ṣigha · iʿrab (muḍariʿ) · bab-wazn · muʿtall
+  └─ harf ──▶ stepper      (grouped by function)
 ```
 
 ---
@@ -65,9 +65,18 @@ engine/
   nav.js          PAGES registry · buildPages() · show() · breadcrumbs · shared drawer
 data/
   ism.js fil.js harf.js     top-level pages  (ISM_STEPS / FIL_STEPS / HARF_STEPS + PAGES[...] )
-  murab.js                  ism → muʿrab drill-down
-  murab-states.js           muʿrab → marfuʿ / mansub / majrur drill-downs
+  murab.js                  ism → muʿrab drill-down (states + signs of iʿrab)
+  murab-states.js           muʿrab → marfuʿ / mansub / majrur (each closes with tawabiʿ)
+  mushtaqq.js               ism → derived-noun types
+  ghayr-munsarif.js         ism → diptote causes (asbab al-manʿ)
+  fil-murab.js              fiʿl → iʿrab of the muḍariʿ (marfuʿ/mansub/majzum)
+  sigha.js                  fiʿl → the 14 ṣigha (gardan)
+  mazid.js                  fiʿl → bab & wazn (mujarrad / mazid)
+  mutall.js                 fiʿl → sound & weak verbs
 app.js            home quiz + boot: buildPages(), wire home cards, show(null)
+docs/
+  grammar-map.md            the conclusive taxonomy (reference — incl. unbuilt nodes)
+  page-data-spec.md         the data contract one page module must follow
 ```
 
 ### The page tree (data model)
@@ -114,47 +123,48 @@ unseen steps cost nothing.
 
 ## Grammar map
 
-Legend:  **✓** own nested stepper page (built) · **☐** planned drill-down ·
-*(unmarked)* taught as cards on its parent page.
+Legend:  **✓** own nested stepper page · **☐** planned · *(unmarked)* taught as
+cards/steps on its parent.  The full taxonomy — every node, built or not — lives in
+[`docs/grammar-map.md`](docs/grammar-map.md); below is what the app teaches **today**.
 
 ```
 الكلمة  Kalimah — every Arabic word is one of:
 │
-├─ ISM ( noun) ✓
-│   ├─ number ............... mufrad · muthanna · jamʿ
-│   ├─ gender ............... mudhakkar · muʾannath
-│   ├─ definiteness ........ nakirah · maʿrifah
-│   │     └─ 7 maʿrifah ..... damir ☐ · ʿalam · ism-isharah · mawsul ☐ · bi-al · mudaf · munada
-│   ├─ iʿrab ............... muʿrab ✓ · mabni
-│   │     └─ MUʿRAB ✓
-│   │           ├─ marfuʿ ✓ ── faʿil · naʾib al-faʿil · mubtada · khabar · ism kana · khabar inna
-│   │           ├─ mansub ✓ ── mafʿul bihi/mutlaq/li-ajlih/fih/maʿah · hal · tamyiz · mustathna
-│   │           │                · khabar kana · ism inna · munada
-│   │           ├─ majrur ✓ ── bi-harf al-jarr · mudaf ilayh · tabiʿ (naʿt/maʿtuf)
-│   │           ├─ by letters ☐ ── muthanna · jamʿ mudhakkar salim · asmaʾ khamsah
-│   │           └─ estimated ☐ ── maqsur · manqus  (muqaddar)
-│   ├─ derivation .......... jamid · mushtaqq ☐ (ism faʿil/mafʿul, sifah mushabbahah, …)
-│   ├─ tanwin .............. munsarif · ghayr munsarif ☐ (asbab al-manʿ)
-│   └─ ending ............. sahih · maqsur · manqus · mamdud
+├─ ISM ✓
+│   ├─ number .......... mufrad · muthanna · jamʿ
+│   ├─ gender .......... mudhakkar · muʾannath
+│   ├─ definiteness .... nakirah · maʿrifah (damir · ʿalam · isharah · mawsul · bi-al · mudaf · munada)
+│   ├─ derivation ...... jamid · mushtaqq ✓ (faʿil · mafʿul · sifah mushabbahah · tafdil · mubalagha · zaman/makan · alah)
+│   ├─ tanwin .......... munsarif · ghayr munsarif ✓ (asbab al-manʿ)
+│   ├─ ending .......... sahih · maqsur · manqus · mamdud
+│   └─ iʿrab ........... mabni · muʿrab ✓
+│         MUʿRAB ✓  — states + signs (harakat · huruf · muqaddar)
+│           ├─ marfuʿ ✓ ── faʿil · naʾib · mubtada · khabar · ism kana · khabar inna
+│           ├─ mansub ✓ ── mafʿul ×5 · hal · tamyiz · mustathna · khabar kana · ism inna · munada
+│           └─ majrur ✓ ── bi-harf al-jarr · mudaf ilayh
+│              · tawabiʿ (naʿt · maʿtuf · taʾkid · badal) — taught in all three states
 │
-├─ FIʿL (verb) ✓
-│   ├─ tense ............... madi · mudariʿ · amr
-│   ├─ transitivity ....... lazim · mutaʿaddi
-│   ├─ voice .............. maʿlum · majhul
-│   ├─ root letters ....... mujarrad · mazid ☐ (abwab / awzan)
-│   ├─ soundness ......... sahih · muʿtall
-│   ├─ conjugability ..... mutasarrif · jamid
-│   └─ special classes ... nakisah ☐ · muqarabah · qulub · madh-wa-dhamm
+├─ FIʿL ✓
+│   ├─ tense ........... madi · mudariʿ · amr
+│   ├─ ṣigha ✓ ......... the 14 amthila / gardan  (person × number × gender)
+│   ├─ transitivity .... lazim · mutaʿaddi
+│   ├─ voice ........... maʿlum · majhul
+│   ├─ bab & wazn ✓ .... mujarrad (6 abwab) · mazid (awzan)
+│   ├─ soundness ✓ ..... sahih (salim · mahmuz · mudaʿʿaf) · muʿtall (mithal · ajwaf · naqis · lafif)
+│   ├─ conjugability ... mutasarrif · jamid
+│   ├─ iʿrab muḍariʿ ✓ . marfuʿ · mansub · majzum  (nawasib · jawazim)
+│   └─ special classes . nakisah ☐ · muqarabah · qulub · madh-wa-dhamm
 │
-└─ HARF (particle) ✓ — grouped by function
+└─ HARF ✓ — grouped by function
     ├─ jar · ʿatf · nasb · jazm
     ├─ mushabbahah (inna & sisters) · istifham
     └─ nida · jawab
 ```
 
-**Built so far:** ism · fiʿl · harf top-level pages; ism → muʿrab; and muʿrab →
-marfuʿ / mansub / majrur. The remaining **☐** nodes follow the same nested-page
-pattern and can be added incrementally.
+**Built:** ism · fiʿl · harf; ism → muʿrab → marfuʿ / mansub / majrur (each closing
+with tawabiʿ); ism → mushtaqq, ghayr-munsarif; fiʿl → ṣigha, iʿrab (muḍariʿ), bab-wazn,
+muʿtall — **13 stepper pages, 64 steps.** Deeper ☐ nodes (maʿrifah's damir/mawsul, the
+fiʿl nawasikh, harf's finer groups) follow the same one-data-entry + one-`link:` recipe.
 
 ---
 
