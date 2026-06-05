@@ -255,6 +255,50 @@
     border-radius:9px; padding:7px 12px; font-size:.9rem; color:var(--ink);
   }
   .recap-type .ar { font-family:'Amiri',serif; direction:rtl; color:var(--teal); font-size:1.15rem; }
+  .recap-row.clickable { cursor:pointer; transition:transform .2s, box-shadow .2s, border-color .2s; }
+  .recap-row.clickable:hover { transform:translateY(-3px); box-shadow:0 14px 28px -16px var(--shadow); border-color:var(--gold); }
+
+  /* ---------- topbar + burger + drawer ---------- */
+  .fil-topbar { margin-bottom:8px; }
+  .fil-topbar .back { margin-bottom:0; }
+  .burger {
+    display:none;
+    position:fixed; top:14px; left:14px; z-index:60;
+    font-size:1.25rem; line-height:1; background:var(--parchment);
+    border:1.5px solid rgba(31,94,87,.4); color:var(--teal); border-radius:9px;
+    width:42px; height:42px; cursor:pointer;
+    box-shadow:0 4px 14px -6px var(--shadow);
+    transition:background .2s, transform .12s, opacity .2s;
+  }
+  body.fil-active .burger { display:block; }
+  .burger:hover { background:rgba(31,94,87,.08); transform:translateY(-1px); }
+  /* hide burger while drawer is open so it doesn't cover the drawer heading */
+  body.drawer-open .burger { opacity:0; pointer-events:none; }
+  /* clear the fixed burger on narrower screens so it doesn't overlap the back link */
+  @media (max-width: 880px){ .fil-topbar { padding-left: 54px; } }
+
+  .drawer-backdrop { position:fixed; inset:0; background:rgba(29,26,22,.45); opacity:0; pointer-events:none; transition:opacity .3s; z-index:40; }
+  .drawer-backdrop.open { opacity:1; pointer-events:auto; }
+  .drawer {
+    position:fixed; top:0; left:0; bottom:0; width:min(84vw,330px);
+    background:var(--parchment); border-right:1px solid rgba(181,138,60,.5);
+    box-shadow:6px 0 36px -12px var(--shadow);
+    transform:translateX(-100%); transition:transform .32s cubic-bezier(.2,.8,.2,1);
+    z-index:50; padding:26px 16px 30px; overflow-y:auto;
+  }
+  .drawer.open { transform:translateX(0); }
+  .drawer-head { font-family:'Fraunces',serif; font-weight:900; font-size:1.2rem; color:var(--ink); padding:0 8px; }
+  .drawer-sub { font-size:.78rem; color:var(--ink-soft); margin:4px 0 16px; padding:0 8px; }
+  .drawer-item {
+    display:block; width:100%; text-align:left;
+    background:transparent; border:none; border-bottom:1px solid rgba(181,138,60,.2);
+    border-radius:9px; padding:12px 10px; cursor:pointer; font-family:inherit; color:var(--ink);
+    transition:background .18s;
+  }
+  .drawer-item:hover { background:rgba(181,138,60,.1); }
+  .drawer-item.active { background:rgba(31,94,87,.1); }
+  .drawer-item .di-kicker { display:block; font-size:.68rem; letter-spacing:1px; text-transform:uppercase; color:var(--gold); font-weight:600; }
+  .drawer-item .di-title { display:block; font-size:.96rem; font-weight:600; margin-top:3px; }
   .choice {
     font-family: inherit;
     font-size: 1rem;
@@ -434,7 +478,9 @@
 
   <!-- ============ FIL VIEW ============ -->
   <section class="view" id="view-fil">
-    <button class="back" id="fil-back">← কালিমার প্রকারে ফিরে যাও</button>
+    <div class="fil-topbar">
+      <button class="back" id="fil-back">← কালিমার প্রকারে ফিরে যাও</button>
+    </div>
     <header style="margin-bottom:8px">
       <div class="eyebrow">أَقْسَامُ الْفِعْل</div>
       <div class="ornament"><span>✦</span></div>
@@ -457,6 +503,15 @@
   </footer>
 
 </div>
+
+<!-- ===== fil burger menu (global, outside views to avoid show/hide flash) ===== -->
+<button class="burger" id="fil-burger" aria-label="মেনু">☰</button>
+<div class="drawer-backdrop" id="fil-backdrop"></div>
+<aside class="drawer" id="fil-drawer">
+  <div class="drawer-head">ফি'লের প্রকারভেদ</div>
+  <div class="drawer-sub">যেকোনো ধাপে যেতে নাম বেছে নাও</div>
+  <nav id="fil-drawer-list"></nav>
+</aside>
 
 <script>
   /* ---------- reusable quiz engine ---------- */
@@ -926,9 +981,9 @@
       <div class="section-label" style="margin-top:6px">✦ সম্পন্ন ✦</div>
       <h2 class="step-title">ফি'লের সব প্রকারভেদ — এক নজরে</h2>
       <p class="sub" style="text-align:center;margin:6px 0 26px">মাশাআল্লাহ! তুমি সাতটি ধাপই শেষ করেছ।</p>
-      ${FIL_STEPS.map(s=>`
-        <div class="recap-row">
-          <div class="recap-kicker">${s.kicker}</div>
+      ${FIL_STEPS.map((s,i)=>`
+        <div class="recap-row clickable" data-go="${i}">
+          <div class="recap-kicker">${s.kicker} &nbsp;→</div>
           <div class="recap-types">
             ${s.cards.map(c=>`<span class="recap-type"><span class="ar">${c.tag}</span> ${c.h3}</span>`).join('')}
           </div>
@@ -938,11 +993,25 @@
         <button class="step-next" id="fil-sum-home">🏠 কালিমায় ফিরে যাও</button>
       </div>`;
 
+    // build drawer (burger menu) list — sections + summary
+    const drawerList = document.getElementById('fil-drawer-list');
+    drawerList.innerHTML = FIL_STEPS.map((s,i)=>
+      `<button class="drawer-item" data-go="${i}"><span class="di-kicker">${s.kicker}</span><span class="di-title">${s.title}</span></button>`
+    ).join('') + `<button class="drawer-item" data-go="${N}"><span class="di-kicker">✦ শেষ</span><span class="di-title">সব প্রকার — এক নজরে</span></button>`;
+    const drawerItems=[...drawerList.querySelectorAll('.drawer-item')];
+
+    const drawer=document.getElementById('fil-drawer');
+    const backdrop=document.getElementById('fil-backdrop');
+    function closeDrawer(){ drawer.classList.remove('open'); backdrop.classList.remove('open'); document.body.classList.remove('drawer-open'); }
+    document.getElementById('fil-burger').addEventListener('click', ()=>{ drawer.classList.add('open'); backdrop.classList.add('open'); document.body.classList.add('drawer-open'); });
+    backdrop.addEventListener('click', closeDrawer);
+
     const stepEls=[...host.querySelectorAll('.step')];
     const dotEls=[...dots.querySelectorAll('.step-dot')];
     let cur=-1;
 
     function go(i){
+      drawerItems.forEach((el,idx)=>el.classList.toggle('active', idx===i));
       if(i>=N){
         stepEls.forEach(el=>el.classList.remove('active'));
         dotEls.forEach(el=>{ el.classList.remove('active'); el.classList.add('done'); });
@@ -968,6 +1037,8 @@
       else if(e.target.classList.contains('step-prev')) go(cur-1);
     });
     dots.addEventListener('click', e=>{ const b=e.target.closest('.step-dot'); if(b) go(+b.dataset.go); });
+    drawerList.addEventListener('click', e=>{ const b=e.target.closest('.drawer-item'); if(b){ go(+b.dataset.go); closeDrawer(); } });
+    summary.addEventListener('click', e=>{ const r=e.target.closest('.recap-row'); if(r){ go(+r.dataset.go); } });
     summary.querySelector('#fil-sum-restart').addEventListener('click', ()=>go(0));
     summary.querySelector('#fil-sum-home').addEventListener('click', ()=>show('view-home'));
     go(0);
@@ -979,6 +1050,12 @@
   function show(id){
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    document.body.classList.toggle('fil-active', id==='view-fil');
+    if(id!=='view-fil'){
+      document.getElementById('fil-drawer').classList.remove('open');
+      document.getElementById('fil-backdrop').classList.remove('open');
+      document.body.classList.remove('drawer-open');
+    }
     window.scrollTo({ top:0, behavior:'smooth' });
   }
   function wireCard(cardId, viewId){
