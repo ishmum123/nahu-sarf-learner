@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>কালিমার তিন প্রকার — ইসম · ফি'ল · হরফ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Hind+Siliguri:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1d1a16;
+    --ink-soft: #4a4339;
+    --parchment: #f4ecd8;
+    --parchment-deep: #e8dcc0;
+    --gold: #b58a3c;
+    --gold-bright: #d9a94e;
+    --teal: #1f5e57;
+    --teal-deep: #15413c;
+    --rust: #a8432a;
+    --green-ok: #2f6d4f;
+    --red-no: #a8432a;
+    --shadow: rgba(29, 26, 22, 0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Hind Siliguri', sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.6;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 50% 50%, transparent 0, transparent 18px, rgba(181,138,60,0.06) 18px, rgba(181,138,60,0.06) 19px, transparent 20px),
+      repeating-linear-gradient(45deg, transparent 0 38px, rgba(31,94,87,0.025) 38px 39px),
+      repeating-linear-gradient(-45deg, transparent 0 38px, rgba(31,94,87,0.025) 38px 39px);
+    background-size: 40px 40px, auto, auto;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    mix-blend-mode: multiply;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ---------- view switching ---------- */
+  .view { display: none; }
+  .view.active { display: block; animation: fadeIn .45s ease; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform:none; } }
+
+  /* ---------- header ---------- */
+  header { text-align: center; margin-bottom: 14px; }
+  .eyebrow {
+    font-family: 'Amiri', serif;
+    font-size: 2.6rem;
+    color: var(--teal);
+    direction: rtl;
+    line-height: 1.2;
+    letter-spacing: 1px;
+  }
+  .ornament {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px; margin: 10px 0 18px; color: var(--gold);
+  }
+  .ornament::before, .ornament::after {
+    content: ""; height: 1px; width: 70px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+  }
+  .ornament::after { background: linear-gradient(90deg, var(--gold), transparent); }
+  .ornament span { font-size: 0.8rem; transform: rotate(45deg); }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(1.7rem, 5vw, 2.5rem);
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .sub { color: var(--ink-soft); margin-top: 8px; font-size: 1rem; }
+
+  /* ---------- back link ---------- */
+  .back {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: inherit; font-weight: 600; font-size: 0.9rem;
+    background: none; border: none; color: var(--teal); cursor: pointer;
+    margin-bottom: 18px; padding: 6px 0; transition: gap .2s, color .2s;
+  }
+  .back:hover { gap: 13px; color: var(--teal-deep); }
+
+  /* ---------- cards ---------- */
+  .section-label {
+    text-align: center;
+    font-size: 0.78rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin: 44px 0 18px;
+  }
+  .cards { display: grid; gap: 16px; }
+  @media (min-width: 620px){ .cards.three { grid-template-columns: repeat(3,1fr); } }
+  @media (min-width: 620px){ .cards.two { grid-template-columns: repeat(2,1fr); } }
+
+  .card {
+    background: linear-gradient(160deg, #fbf5e6, var(--parchment-deep));
+    border: 1px solid rgba(181,138,60,0.4);
+    border-radius: 14px;
+    padding: 22px 20px 24px;
+    box-shadow: 0 6px 18px -10px var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s, border-color .3s;
+    opacity: 0;
+    transform: translateY(18px);
+    animation: rise .7s forwards;
+  }
+  .cards .card:nth-child(1){ animation-delay:.05s; }
+  .cards .card:nth-child(2){ animation-delay:.18s; }
+  .cards .card:nth-child(3){ animation-delay:.31s; }
+  .card::after {
+    content: ""; position: absolute; top: -30px; right: -30px;
+    width: 90px; height: 90px; border-radius: 50%;
+    border: 1.5px solid rgba(181,138,60,0.25);
+  }
+  .card .tag {
+    font-family:'Amiri', serif; font-size: 2.4rem; direction: rtl;
+    color: var(--teal); line-height: 1; margin-bottom: 4px;
+  }
+  .card h3 { font-family:'Fraunces',serif; font-size:1.15rem; color: var(--rust); margin-bottom: 8px; }
+  .card p { font-size: 0.92rem; color: var(--ink-soft); }
+  .card .ex { margin-top: 12px; font-size: 0.85rem; color: var(--ink); }
+  .card .ex b { font-family:'Amiri',serif; font-size:1.2rem; direction:rtl; color: var(--teal-deep); }
+
+  /* clickable card */
+  .card.clickable { cursor: pointer; }
+  .card.clickable:hover { transform: translateY(-6px); box-shadow: 0 16px 30px -14px var(--shadow); border-color: var(--gold); }
+  .card .more {
+    margin-top: 14px; display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.82rem; font-weight: 600; color: var(--gold); transition: gap .2s;
+  }
+  .card.clickable:hover .more { gap: 11px; }
+  .card .soon {
+    margin-top: 14px; display: inline-block;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 1px;
+    color: var(--ink-soft); opacity: .7;
+  }
+  .card.static:hover { transform: translateY(-3px); box-shadow: 0 16px 30px -14px var(--shadow); }
+
+  /* ---------- quiz ---------- */
+  .quiz {
+    margin-top: 40px;
+    background: linear-gradient(165deg, #fdf8ec, #efe4ca);
+    border: 1px solid rgba(181,138,60,0.45);
+    border-radius: 20px;
+    padding: 30px 26px 34px;
+    box-shadow: 0 20px 50px -28px var(--shadow);
+    position: relative;
+  }
+  .quiz-top { display:flex; justify-content:space-between; align-items:center; margin-bottom: 18px; }
+  .counter { font-size: 0.8rem; letter-spacing:1px; color: var(--ink-soft); font-weight:600; }
+  .score { font-size: 0.8rem; font-weight:700; color: var(--teal); }
+  .bar { height: 6px; background: var(--parchment-deep); border-radius: 99px; overflow:hidden; margin-bottom: 26px; }
+  .bar > i { display:block; height:100%; width:0; background: linear-gradient(90deg, var(--gold), var(--gold-bright)); border-radius:99px; transition: width .5s cubic-bezier(.2,.8,.2,1); }
+
+  .prompt { text-align:center; color: var(--ink-soft); font-size:0.95rem; margin-bottom: 18px; }
+  .word {
+    text-align:center;
+    font-family:'Amiri', serif;
+    direction: rtl;
+    font-size: clamp(3rem, 12vw, 4.4rem);
+    color: var(--teal-deep);
+    line-height: 1.9;
+    padding: 0.1em 0;
+    margin: 0;
+    min-height: 1.9em;
+    transition: opacity .25s, transform .25s;
+  }
+  .word.swap { opacity: 0; transform: translateY(10px); }
+  .gloss { text-align:center; color: var(--ink-soft); font-size:0.9rem; min-height:1.2em; margin-bottom: 24px; }
+
+  .choices { display:grid; gap: 12px; }
+  @media (min-width: 520px){ .choices.c3 { grid-template-columns: repeat(3,1fr); } }
+  @media (min-width: 520px){ .choices.c2 { grid-template-columns: repeat(2,1fr); } }
+  @media (min-width: 520px){ .choices.c4 { grid-template-columns: repeat(2,1fr); } }
+
+  /* multi-axis quiz rows */
+  .axis { margin-bottom: 16px; }
+  .axis-label {
+    font-size: 0.8rem; font-weight: 600; color: var(--gold);
+    letter-spacing: 1px; margin-bottom: 7px; display:flex; align-items:center; gap:8px;
+  }
+  .axis-label .ar { font-family:'Amiri',serif; direction:rtl; color: var(--teal); font-size:1.05rem; }
+  .axis-label .mark { margin-left:auto; font-weight:700; font-size:0.95rem; }
+  .axis-label .mark.ok { color: var(--green-ok); }
+  .axis-label .mark.no { color: var(--red-no); }
+  .choice.picked { border-color: var(--gold); background: #f3e6c4; transform: translateY(-2px); }
+
+  /* ---------- stepper (fil page) ---------- */
+  .step-head { margin: 24px 0 30px; }
+  .step-count { text-align:center; font-size:0.78rem; letter-spacing:2px; font-weight:600; color: var(--ink-soft); margin-bottom:10px; }
+  .step-bar { height:6px; background: var(--parchment-deep); border-radius:99px; overflow:hidden; margin-bottom:14px; }
+  .step-bar > i { display:block; height:100%; width:0; background: linear-gradient(90deg, var(--gold), var(--gold-bright)); border-radius:99px; transition: width .5s cubic-bezier(.2,.8,.2,1); }
+  .step-dots { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; }
+  .step-dot { width:11px; height:11px; border-radius:50%; border:1.5px solid var(--gold); background:transparent; cursor:pointer; padding:0; transition: transform .2s, background .2s; }
+  .step-dot.done { background: var(--gold); }
+  .step-dot.active { background: var(--teal); border-color: var(--teal); transform: scale(1.4); }
+  .step { display:none; }
+  .step.active { display:block; animation: fadeIn .4s ease; }
+  .step-title { font-family:'Fraunces',serif; font-weight:900; text-align:center; font-size:clamp(1.4rem,4vw,1.95rem); color:var(--ink); line-height:1.2; }
+  .step-nav { display:flex; justify-content:space-between; gap:12px; margin-top:32px; }
+  .step-prev, .step-next {
+    font-family:inherit; font-weight:600; font-size:0.95rem; border:none; border-radius:10px;
+    padding:13px 24px; cursor:pointer; transition: background .2s, transform .12s, opacity .2s;
+  }
+  .step-prev { background: transparent; color: var(--teal); border:1.5px solid rgba(31,94,87,.4); }
+  .step-prev:hover:not(:disabled){ background: rgba(31,94,87,.08); }
+  .step-prev:disabled { opacity:.3; cursor:default; }
+  .step-next { background: var(--teal); color: var(--parchment); margin-left:auto; }
+  .step-next:hover { background: var(--teal-deep); transform: translateX(3px); }
+  .choice {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: #fbf5e6;
+    border: 1.5px solid rgba(181,138,60,0.5);
+    border-radius: 12px;
+    padding: 16px 10px;
+    cursor: pointer;
+    transition: transform .12s, background .2s, border-color .2s, color .2s;
+    position: relative;
+  }
+  .choice .ar { display:block; font-family:'Amiri',serif; font-size:1.5rem; direction:rtl; color:var(--teal); margin-bottom:2px; transition: color .2s; }
+  .choice:hover:not(:disabled){ transform: translateY(-3px); border-color: var(--gold); }
+  .choice:disabled { cursor: default; }
+  .choice.correct { background: var(--green-ok); border-color: var(--green-ok); color:#fff; }
+  .choice.correct .ar { color:#fff; }
+  .choice.wrong { background: var(--red-no); border-color: var(--red-no); color:#fff; }
+  .choice.wrong .ar { color:#fff; }
+  .choice.dim { opacity: .45; }
+
+  .feedback {
+    margin-top: 20px;
+    border-radius: 12px;
+    padding: 0 18px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height .4s ease, opacity .35s, padding .4s;
+    border-left: 3px solid var(--gold);
+    background: rgba(181,138,60,0.08);
+  }
+  .feedback.show { max-height: 260px; opacity:1; padding: 16px 18px; }
+  .feedback b { color: var(--rust); }
+  .feedback .ar { font-family:'Amiri',serif; direction:rtl; color: var(--teal-deep); font-size:1.15rem; }
+  .next {
+    font-family: inherit; font-weight:600; font-size:0.95rem;
+    margin-top: 16px; background: var(--teal); color: var(--parchment);
+    border: none; border-radius: 10px; padding: 12px 26px; cursor:pointer;
+    display: none; transition: background .2s, transform .12s;
+  }
+  .next:hover { background: var(--teal-deep); transform: translateX(3px); }
+  .next.show { display: inline-block; }
+
+  /* ---------- result ---------- */
+  .result { text-align:center; display:none; padding: 14px 0; }
+  .result.show { display:block; animation: rise .6s forwards; }
+  .result .big {
+    font-family:'Fraunces',serif; font-weight:900;
+    font-size: 3.6rem; color: var(--teal-deep); line-height:1;
+  }
+  .result .label { color: var(--ink-soft); margin: 6px 0 4px; font-size:0.85rem; letter-spacing:2px; text-transform:uppercase; }
+  .result .msg { font-size:1.1rem; margin: 14px 0 22px; color: var(--ink); }
+  .retry {
+    font-family:inherit; font-weight:600; font-size:0.95rem;
+    background: var(--gold); color: var(--ink); border:none;
+    border-radius:10px; padding:12px 30px; cursor:pointer; transition: background .2s, transform .12s;
+  }
+  .retry:hover { background: var(--gold-bright); transform: translateY(-2px); }
+
+  footer { text-align:center; margin-top: 40px; color: var(--ink-soft); font-size: 0.8rem; }
+  footer .ar { font-family:'Amiri',serif; direction:rtl; color: var(--gold); display:block; font-size:1rem; margin-bottom:4px; }
+
+  @keyframes rise { to { opacity:1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HOME VIEW ============ -->
+  <section class="view active" id="view-home">
+    <header>
+      <div class="eyebrow">اَلْكَلِمَة</div>
+      <div class="ornament"><span>✦</span></div>
+      <h1>কালিমার তিন প্রকার</h1>
+      <p class="sub">আরবি ভাষার প্রতিটি শব্দ তিনটির একটি — <b>ইসম</b>, <b>ফি'ল</b> অথবা <b>হরফ</b>। আগে চিনে নাও, তারপর নিজে পরীক্ষা দাও।</p>
+    </header>
+
+    <div class="section-label">আগে চিনে নাও</div>
+    <div class="cards three">
+      <div class="card clickable" id="ism-card" role="button" tabindex="0">
+        <div class="tag">اِسْم</div>
+        <h3>ইসম · নাম</h3>
+        <p>মানুষ, জিনিস, জায়গা বা গুণের নাম। সময়ের সাথে সম্পর্ক নেই।</p>
+        <div class="ex"><b>كِتَاب</b> — বই · <b>مَسْجِد</b> — মসজিদ</div>
+        <span class="more">প্রকারভেদ দেখো →</span>
+      </div>
+      <div class="card clickable" id="fil-card" role="button" tabindex="0">
+        <div class="tag">فِعْل</div>
+        <h3>ফি'ল · কাজ</h3>
+        <p>কোনো কাজ — যার সাথে সময় জড়িত (অতীত, বর্তমান, আদেশ)।</p>
+        <div class="ex"><b>كَتَبَ</b> — লিখলো · <b>يَذْهَبُ</b> — যায়</div>
+        <span class="more">প্রকারভেদ দেখো →</span>
+      </div>
+      <div class="card static">
+        <div class="tag">حَرْف</div>
+        <h3>হরফ · অব্যয়</h3>
+        <p>নিজের কোনো পূর্ণ অর্থ নেই; অন্য শব্দের সাথে মিলে অর্থ দেয়।</p>
+        <div class="ex"><b>فِي</b> — ভিতরে · <b>مِنْ</b> — থেকে</div>
+        <span class="soon">প্রকারভেদ · শীঘ্রই</span>
+      </div>
+    </div>
+
+    <div class="section-label">এবার নিজে চেষ্টা করো</div>
+    <div class="quiz" id="quiz-home"></div>
+  </section>
+
+  <!-- ============ ISM VIEW ============ -->
+  <section class="view" id="view-ism">
+    <button class="back" id="ism-back">← কালিমার প্রকারে ফিরে যাও</button>
+    <header>
+      <div class="eyebrow">أَقْسَامُ الِاسْم</div>
+      <div class="ornament"><span>✦</span></div>
+      <h1>ইসম-এর প্রকারভেদ</h1>
+      <p class="sub">একই ইসমকে তিন দৃষ্টিকোণ থেকে ভাগ করা যায় — <b>সংখ্যা</b>, <b>লিঙ্গ</b> ও <b>নির্দিষ্টতা</b> অনুসারে।</p>
+    </header>
+
+    <div class="section-label">১ · সংখ্যা অনুসারে</div>
+    <div class="cards three">
+      <div class="card static">
+        <div class="tag">مُفْرَد</div>
+        <h3>মুফরাদ · একবচন</h3>
+        <p>একটি বস্তু বা ব্যক্তি বোঝায়। কোনো বিশেষ লেজ নেই।</p>
+        <div class="ex"><b>مُسْلِم</b> — একজন মুসলিম</div>
+      </div>
+      <div class="card static">
+        <div class="tag">مُثَنَّى</div>
+        <h3>মুসান্না · দ্বিবচন</h3>
+        <p>ঠিক দুইটি বোঝায়। শেষে যুক্ত হয় <b style="font-family:Amiri">ـَانِ</b> (আন)।</p>
+        <div class="ex"><b>مُسْلِمَانِ</b> — দুইজন মুসলিম</div>
+      </div>
+      <div class="card static">
+        <div class="tag">جَمْع</div>
+        <h3>জমʿ · বহুবচন</h3>
+        <p>তিন বা তার বেশি বোঝায়। যেমন শেষে <b style="font-family:Amiri">ـُونَ</b> (ঊন)।</p>
+        <div class="ex"><b>مُسْلِمُونَ</b> — অনেক মুসলিম</div>
+      </div>
+    </div>
+
+    <div class="section-label">২ · লিঙ্গ অনুসারে</div>
+    <div class="cards two">
+      <div class="card static">
+        <div class="tag">مُذَكَّر</div>
+        <h3>মুযাক্কার · পুংলিঙ্গ</h3>
+        <p>পুরুষবাচক শব্দ।</p>
+        <div class="ex"><b>مُؤْمِن</b> — মুমিন (পুরুষ)</div>
+      </div>
+      <div class="card static">
+        <div class="tag">مُؤَنَّث</div>
+        <h3>মুআন্নাস · স্ত্রীলিঙ্গ</h3>
+        <p>স্ত্রীবাচক — প্রায়ই শেষে <b style="font-family:Amiri">ة</b> (তা মারবুতা)।</p>
+        <div class="ex"><b>مُؤْمِنَة</b> — মুমিনা (নারী)</div>
+      </div>
+    </div>
+
+    <div class="section-label">৩ · নির্দিষ্টতা অনুসারে</div>
+    <div class="cards two">
+      <div class="card static">
+        <div class="tag">نَكِرَة</div>
+        <h3>নাকিরা · অনির্দিষ্ট</h3>
+        <p>সাধারণ, অনির্দিষ্ট কোনো একটি। প্রায়ই তানভীন থাকে।</p>
+        <div class="ex"><b>كِتَابٌ</b> — একটি বই</div>
+      </div>
+      <div class="card static">
+        <div class="tag">مَعْرِفَة</div>
+        <h3>মাʿরিফা · নির্দিষ্ট</h3>
+        <p>নির্দিষ্ট কোনো একটি — যেমন আগে <b style="font-family:Amiri">الْ</b> (আল-)।</p>
+        <div class="ex"><b>الْكِتَابُ</b> — সেই বইটি</div>
+      </div>
+    </div>
+
+    <div class="section-label">পরীক্ষা · তিনটাই একসাথে</div>
+    <p class="sub" style="text-align:center;margin:-6px 0 0">একটি শব্দ দেখে তার <b>সংখ্যা</b>, <b>লিঙ্গ</b> ও <b>নির্দিষ্টতা</b> — তিনটাই বেছে নাও, তারপর মিলিয়ে দেখো।</p>
+    <div class="quiz" id="quiz-ism"></div>
+  </section>
+
+  <!-- ============ FIL VIEW ============ -->
+  <section class="view" id="view-fil">
+    <button class="back" id="fil-back">← কালিমার প্রকারে ফিরে যাও</button>
+    <header style="margin-bottom:8px">
+      <div class="eyebrow">أَقْسَامُ الْفِعْل</div>
+      <div class="ornament"><span>✦</span></div>
+      <h1>ফি'ল-এর প্রকারভেদ</h1>
+    </header>
+
+    <div class="step-head">
+      <div class="step-count" id="fil-stepcount"></div>
+      <div class="step-bar"><i id="fil-stepfill"></i></div>
+      <div class="step-dots" id="fil-stepdots"></div>
+    </div>
+
+    <div id="fil-steps"></div>
+  </section>
+
+  <footer>
+    <span class="ar">طَلَبُ الْعِلْمِ فَرِيضَةٌ</span>
+    জ্ঞান অন্বেষণ প্রতিটি মুসলিমের উপর ফরজ
+  </footer>
+
+</div>
+
+<script>
+  /* ---------- reusable quiz engine ---------- */
+  function makeQuiz(rootId, config){
+    const root = document.getElementById(rootId);
+    const colClass = config.choices.length === 2 ? 'c2' : config.choices.length === 4 ? 'c4' : 'c3';
+    root.innerHTML = `
+      <div class="quiz-top">
+        <span class="counter"></span>
+        <span class="score"></span>
+      </div>
+      <div class="bar"><i></i></div>
+      <div class="play">
+        <p class="prompt">${config.prompt}</p>
+        <div class="word">—</div>
+        <div class="gloss"></div>
+        <div class="choices ${colClass}">
+          ${config.choices.map(c=>`<button class="choice" data-type="${c.type}"><span class="ar">${c.ar}</span>${c.bn}</button>`).join('')}
+        </div>
+        <div class="feedback"></div>
+        <button class="next">পরের শব্দ →</button>
+      </div>
+      <div class="result">
+        <div class="label">তোমার ফলাফল</div>
+        <div class="big"></div>
+        <p class="msg"></p>
+        <button class="retry">আবার চেষ্টা করো ↺</button>
+      </div>`;
+
+    const NAME = {}; config.choices.forEach(c => NAME[c.type] = c.bn);
+    const words = config.words;
+    const q = s => root.querySelector(s);
+    const choiceEls = [...root.querySelectorAll('.choice')];
+    const wordEl = q('.word'), glossEl = q('.gloss'), fb = q('.feedback');
+    const nextBtn = q('.next'), counter = q('.counter'), score = q('.score');
+    const barFill = q('.bar > i'), play = q('.play'), result = q('.result');
+
+    let i = 0, correct = 0, answered = false;
+
+    function render(){
+      answered = false;
+      const w = words[i];
+      wordEl.classList.add('swap');
+      setTimeout(()=>{ wordEl.textContent = w.ar; glossEl.textContent=''; wordEl.classList.remove('swap'); }, 180);
+      counter.textContent = `শব্দ ${i+1} / ${words.length}`;
+      score.textContent = `সঠিক ${correct}`;
+      barFill.style.width = (i/words.length*100) + '%';
+      choiceEls.forEach(c=>{ c.disabled=false; c.className='choice'; });
+      fb.className='feedback'; fb.innerHTML='';
+      nextBtn.classList.remove('show');
+    }
+    function answer(btn){
+      if(answered) return; answered = true;
+      const w = words[i], picked = btn.dataset.type, right = w.type;
+      choiceEls.forEach(c=>{
+        c.disabled = true;
+        if(c.dataset.type === right) c.classList.add('correct');
+        else if(c === btn) c.classList.add('wrong');
+        else c.classList.add('dim');
+      });
+      glossEl.textContent = '“' + w.gloss + '”';
+      if(picked === right){ correct++; fb.innerHTML = `<b>সঠিক!</b> ${w.why}`; }
+      else fb.innerHTML = `<b>আবার দেখো —</b> এটি <b>${NAME[right]}</b>। ${w.why}`;
+      fb.classList.add('show');
+      score.textContent = `সঠিক ${correct}`;
+      nextBtn.classList.add('show');
+    }
+    function next(){ i++; if(i >= words.length){ finish(); return; } render(); }
+    function finish(){
+      barFill.style.width = '100%';
+      play.style.display = 'none';
+      result.classList.add('show');
+      result.querySelector('.big').textContent = `${correct}/${words.length}`;
+      let m;
+      if(correct === words.length) m = 'মাশাআল্লাহ! পুরোপুরি সঠিক।';
+      else if(correct >= 8) m = 'খুব ভালো! প্রায় সবই ঠিক।';
+      else if(correct >= 5) m = 'ভালো শুরু। কার্ডগুলো আরেকবার দেখে নাও।';
+      else m = 'চিন্তা নেই — উপরের কার্ডগুলো আবার পড়ে আবার চেষ্টা করো।';
+      result.querySelector('.msg').textContent = m;
+    }
+    function restart(){ i=0; correct=0; result.classList.remove('show'); play.style.display='block'; render(); }
+
+    choiceEls.forEach(c => c.addEventListener('click', ()=>answer(c)));
+    nextBtn.addEventListener('click', next);
+    result.querySelector('.retry').addEventListener('click', restart);
+    render();
+    return { restart };
+  }
+
+  /* ---------- quiz 1: kalima types ---------- */
+  makeQuiz('quiz-home', {
+    prompt: 'এই শব্দটি কোন প্রকার?',
+    choices: [
+      { type:'ism',  ar:'اِسْم', bn:'ইসম' },
+      { type:'fil',  ar:'فِعْل', bn:"ফি'ল" },
+      { type:'harf', ar:'حَرْف', bn:'হরফ' },
+    ],
+    words: [
+      { ar:'كِتَاب',  type:'ism',  gloss:'বই',      why:'এটি একটি জিনিসের নাম, তাই ইসম। এর আগে <span class="ar">الْ</span> (আল-) লাগানো যায়।' },
+      { ar:'كَتَبَ',  type:'fil',  gloss:'সে লিখলো', why:'অতীতকালের কাজ — কাজের সাথে সময় জড়িত, তাই ফি\'ল।' },
+      { ar:'فِي',     type:'harf', gloss:'ভিতরে',    why:'একা বললে পূর্ণ অর্থ হয় না — অন্য শব্দের সাথে মিলে অর্থ দেয়, তাই হরফ।' },
+      { ar:'مَسْجِد', type:'ism',  gloss:'মসজিদ',    why:'এটি একটি জায়গার নাম, তাই ইসম।' },
+      { ar:'يَذْهَبُ', type:'fil', gloss:'সে যায়',   why:'বর্তমান/ভবিষ্যৎ কালের কাজ — সময় জড়িত, তাই ফি\'ল।' },
+      { ar:'مِنْ',    type:'harf', gloss:'থেকে',     why:'নিজে অর্থ বহন করে না, সম্পর্ক বোঝায় — তাই হরফ।' },
+      { ar:'وَلَد',   type:'ism',  gloss:'ছেলে',     why:'এটি মানুষের নাম, তাই ইসম। তানভীন (وَلَدٌ) আসতে পারে।' },
+      { ar:'هَلْ',    type:'harf', gloss:'কি? (প্রশ্ন)', why:'প্রশ্নবোধক অব্যয় — একা অর্থহীন, বাক্যে অর্থ দেয়, তাই হরফ।' },
+      { ar:'جَلَسَ',  type:'fil',  gloss:'সে বসলো',  why:'অতীতের কাজ — সময় আছে, তাই ফি\'ল।' },
+      { ar:'بَيْت',   type:'ism',  gloss:'ঘর',       why:'একটি জিনিস/জায়গার নাম, তাই ইসম।' },
+    ],
+  });
+
+  /* ---------- multi-axis quiz engine ---------- */
+  function makeMultiQuiz(rootId, config){
+    const root = document.getElementById(rootId);
+    root.innerHTML = `
+      <div class="quiz-top">
+        <span class="counter"></span>
+        <span class="score"></span>
+      </div>
+      <div class="bar"><i></i></div>
+      <div class="play">
+        <p class="prompt">${config.prompt}</p>
+        <div class="word">—</div>
+        <div class="gloss"></div>
+        <div class="axes">
+          ${config.axes.map((ax,ai)=>`
+            <div class="axis" data-axis="${ai}">
+              <div class="axis-label"><span class="ar">${ax.ar}</span> ${ax.label}<span class="mark"></span></div>
+              <div class="choices ${ax.choices.length===3?'c3':'c2'}">
+                ${ax.choices.map(c=>`<button class="choice" data-type="${c.type}">${c.bn}</button>`).join('')}
+              </div>
+            </div>`).join('')}
+        </div>
+        <div class="feedback"></div>
+        <button class="next check">মিলিয়ে দেখো ✓</button>
+      </div>
+      <div class="result">
+        <div class="label">তোমার ফলাফল</div>
+        <div class="big"></div>
+        <p class="msg"></p>
+        <button class="retry">আবার চেষ্টা করো ↺</button>
+      </div>`;
+
+    const axes = config.axes, words = config.words;
+    const q = s => root.querySelector(s);
+    const wordEl=q('.word'), glossEl=q('.gloss'), fb=q('.feedback');
+    const actBtn=q('.next'), counter=q('.counter'), score=q('.score');
+    const barFill=q('.bar > i'), play=q('.play'), result=q('.result');
+    const axisEls=[...root.querySelectorAll('.axis')];
+
+    // total points = words * number of axes
+    const TOTAL = words.length * axes.length;
+    let i=0, points=0, picks={}, checked=false;
+
+    function render(){
+      checked=false; picks={};
+      const w=words[i];
+      wordEl.classList.add('swap');
+      setTimeout(()=>{ wordEl.textContent=w.ar; glossEl.textContent=''; wordEl.classList.remove('swap'); },180);
+      counter.textContent=`শব্দ ${i+1} / ${words.length}`;
+      score.textContent=`স্কোর ${points} / ${TOTAL}`;
+      barFill.style.width=(i/words.length*100)+'%';
+      axisEls.forEach(ax=>{
+        ax.querySelector('.mark').className='mark';
+        ax.querySelector('.mark').textContent='';
+        ax.querySelectorAll('.choice').forEach(c=>{ c.disabled=false; c.className='choice'; });
+      });
+      fb.className='feedback'; fb.innerHTML='';
+      actBtn.textContent='মিলিয়ে দেখো ✓';
+      actBtn.classList.add('check');
+      actBtn.classList.remove('show'); actBtn.style.display='none';
+    }
+
+    function pick(axIdx, btn){
+      if(checked) return;
+      const ax=axisEls[axIdx];
+      ax.querySelectorAll('.choice').forEach(c=>c.classList.remove('picked'));
+      btn.classList.add('picked');
+      picks[axIdx]=btn.dataset.type;
+      // reveal check button once all axes picked
+      if(Object.keys(picks).length===axes.length){ actBtn.style.display='inline-block'; }
+    }
+
+    function check(){
+      if(checked) return; checked=true;
+      const w=words[i];
+      let lines=[];
+      axes.forEach((ax,ai)=>{
+        const right=w.ans[ai], picked=picks[ai];
+        const axEl=axisEls[ai], mark=axEl.querySelector('.mark');
+        axEl.querySelectorAll('.choice').forEach(c=>{
+          c.disabled=true;
+          if(c.dataset.type===right) c.classList.add('correct');
+          else if(c.dataset.type===picked) c.classList.add('wrong');
+          else c.classList.add('dim');
+        });
+        const ok = picked===right;
+        if(ok) points++;
+        mark.textContent = ok?'✓':'✗';
+        mark.classList.add(ok?'ok':'no');
+        const rightBn = ax.choices.find(c=>c.type===right).bn;
+        lines.push(`<div style="margin:6px 0"><b style="color:${ok?'var(--green-ok)':'var(--rust)'}">${ax.label}: ${ok?'✓ '+rightBn:'✗ সঠিক — '+rightBn}</b><br><span style="font-size:.92em">${w.why[ai]}</span></div>`);
+      });
+      glossEl.textContent='“'+w.gloss+'”';
+      fb.innerHTML=lines.join('');
+      fb.classList.add('show');
+      score.textContent=`স্কোর ${points} / ${TOTAL}`;
+      actBtn.textContent = (i+1>=words.length)?'ফলাফল দেখো →':'পরের শব্দ →';
+      actBtn.classList.remove('check');
+    }
+
+    function nextWord(){ i++; if(i>=words.length){ finish(); return; } render(); }
+
+    function finish(){
+      barFill.style.width='100%'; play.style.display='none';
+      result.classList.add('show');
+      result.querySelector('.big').textContent=`${points}/${TOTAL}`;
+      const pct=points/TOTAL;
+      let m;
+      if(pct===1) m='মাশাআল্লাহ! তিন প্রকারই পুরোপুরি চিনে ফেলেছো।';
+      else if(pct>=0.8) m='খুব ভালো! প্রায় সবই ঠিক।';
+      else if(pct>=0.5) m='ভালো শুরু। উপরের কার্ডগুলো আরেকবার দেখে নাও।';
+      else m='চিন্তা নেই — তিনটি ভাগ আবার পড়ে আবার চেষ্টা করো।';
+      result.querySelector('.msg').textContent=m;
+    }
+
+    function restart(){ i=0; points=0; result.classList.remove('show'); play.style.display='block'; render(); }
+
+    axisEls.forEach((ax,ai)=>{
+      ax.querySelectorAll('.choice').forEach(btn=>btn.addEventListener('click',()=>pick(ai,btn)));
+    });
+    actBtn.addEventListener('click',()=>{ checked?nextWord():check(); });
+    result.querySelector('.retry').addEventListener('click',restart);
+    render();
+  }
+
+  /* ---------- quiz 2: ism — three attributes at once ---------- */
+  makeMultiQuiz('quiz-ism', {
+    prompt: 'এই শব্দটির তিনটি বৈশিষ্ট্যই বেছে নাও:',
+    axes: [
+      { label:'সংখ্যা', ar:'العدد', choices:[
+        { type:'mufrad',   bn:'একবচন' },
+        { type:'muthanna', bn:'দ্বিবচন' },
+        { type:'jam',      bn:'বহুবচন' },
+      ]},
+      { label:'লিঙ্গ', ar:'الجنس', choices:[
+        { type:'muz', bn:'পুংলিঙ্গ' },
+        { type:'mua', bn:'স্ত্রীলিঙ্গ' },
+      ]},
+      { label:'নির্দিষ্টতা', ar:'التعريف', choices:[
+        { type:'nak', bn:'অনির্দিষ্ট' },
+        { type:'mar', bn:'নির্দিষ্ট' },
+      ]},
+    ],
+    // ans order matches axes: [number, gender, definiteness]
+    words: [
+      { ar:'الْمُسْلِمَانِ', gloss:'সেই দুই মুসলিম', ans:['muthanna','muz','mar'],
+        why:['শেষে <span class="ar">ـَانِ</span> (আন) — দ্বিবচন।','পুরুষবাচক, তা-মারবুতা নেই — পুংলিঙ্গ।','আগে <span class="ar">الْ</span> (আল-) — নির্দিষ্ট।'] },
+      { ar:'مُعَلِّمَةٌ', gloss:'একজন শিক্ষিকা', ans:['mufrad','mua','nak'],
+        why:['একটিমাত্র — একবচন।','শেষে <span class="ar">ة</span> (তা-মারবুতা) — স্ত্রীলিঙ্গ।','তানভীন (<span class="ar">ٌ</span>) আছে, আল- নেই — অনির্দিষ্ট।'] },
+      { ar:'الْمُؤْمِنُونَ', gloss:'সেই মুমিনগণ', ans:['jam','muz','mar'],
+        why:['শেষে <span class="ar">ـُونَ</span> (ঊন) — বহুবচন।','পুরুষবাচক — পুংলিঙ্গ।','আগে <span class="ar">الْ</span> — নির্দিষ্ট।'] },
+      { ar:'كِتَابٌ', gloss:'একটি বই', ans:['mufrad','muz','nak'],
+        why:['একটিমাত্র, কোনো লেজ নেই — একবচন।','পুরুষবাচক শব্দ — পুংলিঙ্গ।','তানভীন আছে, আল- নেই — অনির্দিষ্ট।'] },
+      { ar:'مُسْلِمَتَانِ', gloss:'দুই মুসলিমা', ans:['muthanna','mua','nak'],
+        why:['শেষে <span class="ar">ـَانِ</span> (আন) — দ্বিবচন।','মূলে <span class="ar">ة</span> আছে (মুসলিমা) — স্ত্রীলিঙ্গ।','আল- নেই — অনির্দিষ্ট।'] },
+      { ar:'الْقَلَمُ', gloss:'সেই কলমটি', ans:['mufrad','muz','mar'],
+        why:['একটিমাত্র — একবচন।','পুরুষবাচক শব্দ — পুংলিঙ্গ।','আগে <span class="ar">الْ</span> — নির্দিষ্ট।'] },
+      { ar:'صَالِحَاتٌ', gloss:'কিছু সৎ নারী', ans:['jam','mua','nak'],
+        why:['শেষে <span class="ar">ـَات</span> (আত) — বহুবচন।','<span class="ar">ـَات</span> স্ত্রীবাচক বহুবচন — স্ত্রীলিঙ্গ।','তানভীন আছে — অনির্দিষ্ট।'] },
+      { ar:'الْبِنْتُ', gloss:'সেই মেয়েটি', ans:['mufrad','mua','mar'],
+        why:['একটিমাত্র — একবচন।','অর্থেই স্ত্রীবাচক — স্ত্রীলিঙ্গ।','আগে <span class="ar">الْ</span> — নির্দিষ্ট।'] },
+    ],
+  });
+
+  /* ---------- fil page: 7-step guided lesson ---------- */
+  const FIL_STEPS = [
+    {
+      kicker:'১ · কাল অনুসারে', title:'মাদ্বী · মুদারিʿ · আমর',
+      sub:'কাজ কখন হয়েছে তার উপর ভিত্তি করে।',
+      hint:'শব্দটি অতীতের কাজ, চলমান কাজ, না আদেশ?',
+      cards:[
+        { tag:'مَاضٍ',    h3:'মাদ্বী · অতীত',            p:'কাজটি আগেই হয়ে গেছে।', ex:'<b>كَتَبَ</b> — সে লিখলো' },
+        { tag:'مُضَارِع', h3:'মুদারিʿ · বর্তমান/ভবিষ্যৎ', p:'কাজ চলছে বা হবে। শুরুতে <b style="font-family:Amiri">أ·ن·ي·ت</b>।', ex:'<b>يَكْتُبُ</b> — সে লেখে' },
+        { tag:'أَمْر',    h3:'আমর · আদেশ',              p:'কিছু করার আদেশ বা অনুরোধ।', ex:'<b>اُكْتُبْ</b> — তুমি লেখো!' },
+      ],
+      quiz:{ prompt:"এই ফি'লটি কোন কালের?", choices:[
+        { type:'madi', ar:'مَاضٍ', bn:'অতীত' },{ type:'mudari', ar:'مُضَارِع', bn:'বর্তমান' },{ type:'amr', ar:'أَمْر', bn:'আদেশ' }],
+        words:[
+          { ar:'كَتَبَ',  type:'madi',   gloss:'সে লিখলো',   why:'কাজটি হয়ে গেছে — মাদ্বী।' },
+          { ar:'يَكْتُبُ', type:'mudari', gloss:'সে লেখে',    why:'শুরুতে <span class="ar">ي</span>, চলমান — মুদারিʿ।' },
+          { ar:'اُكْتُبْ', type:'amr',    gloss:'তুমি লেখো!', why:'আদেশ — আমর।' },
+          { ar:'ذَهَبَ',  type:'madi',   gloss:'সে গেল',     why:'ঘটে গেছে — মাদ্বী।' },
+          { ar:'يَجْلِسُ', type:'mudari', gloss:'সে বসে',     why:'শুরুতে <span class="ar">ي</span> — মুদারিʿ।' },
+          { ar:'اِجْلِسْ', type:'amr',    gloss:'তুমি বসো!',  why:'আদেশ — আমর।' },
+          { ar:'نَصَرَ',  type:'madi',   gloss:'সে সাহায্য করল', why:'অতীত — মাদ্বী।' },
+          { ar:'تَذْهَبُ', type:'mudari', gloss:'তুমি যাও',   why:'শুরুতে <span class="ar">ت</span> — মুদারিʿ।' },
+        ] },
+    },
+    {
+      kicker:'২ · কর্ম অনুসারে', title:'লাযিম / মুতাʿআদ্দী',
+      sub:'কাজটি object নেয় কি না, তার উপর ভিত্তি করে।',
+      hint:'ক্রিয়াটি object নেয় (সকর্মক) না নেয় না (অকর্মক)?',
+      cards:[
+        { tag:'لَازِم',     h3:'লাযিম · অকর্মক',    p:'কাজ কর্তাতেই শেষ, কোনো object লাগে না।', ex:'<b>جَلَسَ</b> — সে বসল' },
+        { tag:'مُتَعَدٍّ',  h3:'মুতাʿআদ্দী · সকর্মক', p:'কাজ object-এর উপর গিয়ে পড়ে — কী করল? জানা লাগে।', ex:'<b>كَتَبَ</b> — সে (চিঠি) লিখল' },
+      ],
+      quiz:{ prompt:"এই ফি'লটি অকর্মক না সকর্মক?", choices:[
+        { type:'lazim', ar:'لَازِم', bn:'অকর্মক' },{ type:'muta', ar:'مُتَعَدٍّ', bn:'সকর্মক' }],
+        words:[
+          { ar:'جَلَسَ', type:'lazim', gloss:'সে বসল',      why:'বসা কাজ কর্তাতেই শেষ — অকর্মক (লাযিম)।' },
+          { ar:'كَتَبَ', type:'muta',  gloss:'সে লিখল',     why:'কী লিখল? object লাগে — সকর্মক (মুতাʿআদ্দী)।' },
+          { ar:'ذَهَبَ', type:'lazim', gloss:'সে গেল',      why:'যাওয়া object নেয় না — অকর্মক।' },
+          { ar:'ضَرَبَ', type:'muta',  gloss:'সে মারল',     why:'কাকে মারল? object লাগে — সকর্মক।' },
+          { ar:'نَامَ',  type:'lazim', gloss:'সে ঘুমাল',     why:'ঘুমানো object নেয় না — অকর্মক।' },
+          { ar:'فَتَحَ', type:'muta',  gloss:'সে খুলল',     why:'কী খুলল? object লাগে — সকর্মক।' },
+          { ar:'قَامَ',  type:'lazim', gloss:'সে দাঁড়াল',   why:'দাঁড়ানো object নেয় না — অকর্মক।' },
+          { ar:'شَرِبَ', type:'muta',  gloss:'সে পান করল',   why:'কী পান করল? object লাগে — সকর্মক।' },
+        ] },
+    },
+    {
+      kicker:'৩ · কর্তা অনুসারে', title:'মাʿলূম / মাজহূল',
+      sub:'কর্তা প্রকাশ পায় না লুকানো থাকে।',
+      hint:'কর্তা জানা (কর্তৃবাচ্য) না লুকানো (কর্মবাচ্য)?',
+      cards:[
+        { tag:'مَعْلُوم', h3:'মাʿলূম · কর্তৃবাচ্য', p:'কর্তা স্পষ্ট। হরকত: প্রায়ই যবর-যবর।', ex:'<b>نَصَرَ</b> — সে সাহায্য করল' },
+        { tag:'مَجْهُول', h3:'মাজহূল · কর্মবাচ্য',  p:'কর্তা লুকানো; শুরুতে পেশ, মাঝে যের।', ex:'<b>نُصِرَ</b> — তাকে সাহায্য করা হলো' },
+      ],
+      quiz:{ prompt:"এই ফি'লটি কর্তৃবাচ্য না কর্মবাচ্য?", choices:[
+        { type:'malum', ar:'مَعْلُوم', bn:'কর্তৃবাচ্য' },{ type:'majhul', ar:'مَجْهُول', bn:'কর্মবাচ্য' }],
+        words:[
+          { ar:'نَصَرَ', type:'malum',  gloss:'সে সাহায্য করল',  why:'যবর-যবর, কর্তা স্পষ্ট — মাʿলূম।' },
+          { ar:'نُصِرَ', type:'majhul', gloss:'তাকে সাহায্য করা হলো', why:'শুরুতে পেশ, মাঝে যের (<span class="ar">نُـ ـِ</span>) — মাজহূল।' },
+          { ar:'كَتَبَ', type:'malum',  gloss:'সে লিখল',        why:'কর্তা স্পষ্ট — মাʿলূম।' },
+          { ar:'كُتِبَ', type:'majhul', gloss:'লেখা হলো',       why:'পেশ + যের — মাজহূল।' },
+          { ar:'ضَرَبَ', type:'malum',  gloss:'সে মারল',        why:'কর্তা স্পষ্ট — মাʿলূম।' },
+          { ar:'ضُرِبَ', type:'majhul', gloss:'মারা হলো',       why:'পেশ + যের — মাজহূল।' },
+          { ar:'فَتَحَ', type:'malum',  gloss:'সে খুলল',        why:'কর্তা স্পষ্ট — মাʿলূম।' },
+          { ar:'فُتِحَ', type:'majhul', gloss:'খোলা হলো',       why:'পেশ + যের — মাজহূল।' },
+        ] },
+    },
+    {
+      kicker:'৪ · হরফ সংখ্যা অনুসারে', title:'মুজার্রাদ / মাযীদ',
+      sub:'মূল হরফের সাথে বাড়তি হরফ আছে কি না।',
+      hint:'মূল ৩ হরফ (মুজার্রাদ), না বাড়তি হরফ যুক্ত (মাযীদ)?',
+      cards:[
+        { tag:'مُجَرَّد', h3:'মুজার্রাদ · মৌলিক', p:'শুধু মূল হরফ (সাধারণত ৩টি), কিছু বাড়ানো নেই।', ex:'<b>نَصَرَ</b> — সাহায্য করল' },
+        { tag:'مَزِيد',   h3:'মাযীদ · বর্ধিত',    p:'মূল হরফের সাথে এক বা একাধিক বাড়তি হরফ।', ex:'<b>أَكْرَمَ</b> — সম্মান করল' },
+      ],
+      quiz:{ prompt:"এই ফি'লটি মৌলিক না বর্ধিত?", choices:[
+        { type:'mujarrad', ar:'مُجَرَّد', bn:'মুজার্রাদ' },{ type:'mazid', ar:'مَزِيد', bn:'মাযীদ' }],
+        words:[
+          { ar:'نَصَرَ',     type:'mujarrad', gloss:'সাহায্য করল',  why:'শুধু ৩ মূল হরফ — মুজার্রাদ।' },
+          { ar:'أَكْرَمَ',    type:'mazid',    gloss:'সম্মান করল',   why:'শুরুতে বাড়তি <span class="ar">أ</span> — মাযীদ।' },
+          { ar:'كَتَبَ',     type:'mujarrad', gloss:'লিখল',        why:'৩ মূল হরফ, বাড়তি নেই — মুজার্রাদ।' },
+          { ar:'عَلَّمَ',     type:'mazid',    gloss:'শেখাল',       why:'মাঝের হরফে শদ্দা (দ্বিগুণ) — বাড়তি, মাযীদ।' },
+          { ar:'جَلَسَ',     type:'mujarrad', gloss:'বসল',         why:'৩ মূল হরফ — মুজার্রাদ।' },
+          { ar:'اِسْتَغْفَرَ', type:'mazid',    gloss:'ক্ষমা চাইল',   why:'<span class="ar">اِسْتَ</span> বাড়তি হরফ যুক্ত — মাযীদ।' },
+          { ar:'ضَرَبَ',     type:'mujarrad', gloss:'মারল',        why:'৩ মূল হরফ — মুজার্রাদ।' },
+          { ar:'تَكَلَّمَ',    type:'mazid',    gloss:'কথা বলল',     why:'<span class="ar">تَ</span> + শদ্দা বাড়তি — মাযীদ।' },
+        ] },
+    },
+    {
+      kicker:'৫ · গঠন অনুসারে', title:'সহীহ / মুʿতাল্ল',
+      sub:'মূল হরফে দুর্বল হরফ (ا و ي) আছে কি না।',
+      hint:'মূলে ا/و/ي নেই (সহীহ) না আছে (মুʿতাল্ল)?',
+      cards:[
+        { tag:'صَحِيح',  h3:'সহীহ · নিরোগ', p:'মূল হরফে কোনো ইল্লত-হরফ (<b style="font-family:Amiri">ا و ي</b>) নেই।', ex:'<b>نَصَرَ</b> — সাহায্য করল' },
+        { tag:'مُعْتَلّ', h3:'মুʿতাল্ল · রুগ্ণ', p:'মূল হরফে ইল্লত-হরফ আছে।', ex:'<b>قَالَ</b> — বলল' },
+      ],
+      quiz:{ prompt:"এই ফি'লটি সহীহ না মুʿতাল্ল?", choices:[
+        { type:'sahih', ar:'صَحِيح', bn:'সহীহ' },{ type:'mutall', ar:'مُعْتَلّ', bn:'মুʿতাল্ল' }],
+        words:[
+          { ar:'نَصَرَ', type:'sahih',  gloss:'সাহায্য করল', why:'মূলে ا/و/ي নেই — সহীহ।' },
+          { ar:'قَالَ',  type:'mutall', gloss:'বলল',        why:'মাঝে ইল্লত-হরফ (<span class="ar">ا</span>, মূলে و) — মুʿতাল্ল।' },
+          { ar:'كَتَبَ', type:'sahih',  gloss:'লিখল',       why:'মূলে দুর্বল হরফ নেই — সহীহ।' },
+          { ar:'وَعَدَ', type:'mutall', gloss:'প্রতিশ্রুতি দিল', why:'প্রথম হরফ <span class="ar">و</span> দুর্বল — মুʿতাল্ল।' },
+          { ar:'جَلَسَ', type:'sahih',  gloss:'বসল',        why:'দুর্বল হরফ নেই — সহীহ।' },
+          { ar:'رَمَى',  type:'mutall', gloss:'নিক্ষেপ করল', why:'শেষ হরফ দুর্বল (<span class="ar">ى</span>) — মুʿতাল্ল।' },
+          { ar:'ضَرَبَ', type:'sahih',  gloss:'মারল',       why:'দুর্বল হরফ নেই — সহীহ।' },
+          { ar:'بَاعَ',  type:'mutall', gloss:'বিক্রি করল',  why:'মাঝে দুর্বল হরফ — মুʿতাল্ল।' },
+        ] },
+    },
+    {
+      kicker:'৬ · রূপ পরিবর্তন অনুসারে', title:'মুতাসার্রিফ / জামিদ',
+      sub:'কাল অনুযায়ী রূপ বদলায় কি না।',
+      hint:'ক্রিয়াটি রূপ বদলায় (মুতাসার্রিফ) না এক রূপেই থাকে (জামিদ)?',
+      cards:[
+        { tag:'مُتَصَرِّف', h3:'মুতাসার্রিফ · পরিবর্তনশীল', p:'মাদ্বী → মুদারিʿ → আমর সব রূপ হয়।', ex:'<b>كَتَبَ → يَكْتُبُ → اُكْتُبْ</b>' },
+        { tag:'جَامِد',    h3:'জামিদ · অপরিবর্তনীয়',     p:'এক রূপেই জমে থাকে, বদলায় না।', ex:'<b>لَيْسَ</b> — নয়' },
+      ],
+      quiz:{ prompt:"এই ফি'লটি পরিবর্তনশীল না অপরিবর্তনীয়?", choices:[
+        { type:'mut', ar:'مُتَصَرِّف', bn:'মুতাসার্রিফ' },{ type:'jam', ar:'جَامِد', bn:'জামিদ' }],
+        words:[
+          { ar:'كَتَبَ', type:'mut', gloss:'লিখল',  why:'মাদ্বী-মুদারিʿ-আমর সব হয় — মুতাসার্রিফ।' },
+          { ar:'لَيْسَ', type:'jam', gloss:'নয়',    why:'শুধু এক রূপ, বদলায় না — জামিদ।' },
+          { ar:'نَصَرَ', type:'mut', gloss:'সাহায্য করল', why:'সব কালে রূপ বদলায় — মুতাসার্রিফ।' },
+          { ar:'عَسَى',  type:'jam', gloss:'আশা করা যায়', why:'এক রূপেই জমা — জামিদ।' },
+          { ar:'ذَهَبَ', type:'mut', gloss:'গেল',   why:'রূপ বদলায় — মুতাসার্রিফ।' },
+          { ar:'نِعْمَ',  type:'jam', gloss:'কত ভালো', why:'প্রশংসার ফি\'ল, বদলায় না — জামিদ।' },
+          { ar:'جَلَسَ', type:'mut', gloss:'বসল',   why:'রূপ বদলায় — মুতাসার্রিফ।' },
+          { ar:'بِئْسَ',  type:'jam', gloss:'কত নিকৃষ্ট', why:'নিন্দার ফি\'ল, বদলায় না — জামিদ।' },
+        ] },
+    },
+    {
+      kicker:'৭ · বিশেষ শ্রেণি', title:"কিছু বিশেষ ফি'ল",
+      sub:'কিছু ফি\'ল নির্দিষ্ট কাজে ব্যবহৃত বিশেষ শ্রেণির (সবগুলোই জামিদ-ঘেঁষা)।',
+      hint:"ফি'লটি কোন বিশেষ শ্রেণির?",
+      cards:[
+        { tag:'نَاقِصَة',     h3:'আফʿআল নাকিসা', p:'كَانَ ও তার বোনেরা — ইসম উঠায়, খবর নসব দেয়।', ex:'<b>كَانَ، أَصْبَحَ</b>' },
+        { tag:'مُقَارَبَة',   h3:'আফʿআল মুকারাবা', p:'কাজ ঘটার নিকটবর্তী/আশা বোঝায়।', ex:'<b>كَادَ، عَسَى</b>' },
+        { tag:'قُلُوب',      h3:'আফʿআল কুলূব',   p:'মনের কাজ — জানা, ধারণা করা।', ex:'<b>ظَنَّ، عَلِمَ</b>' },
+        { tag:'مَدْح وذَمّ', h3:'প্রশংসা-নিন্দা',  p:'প্রশংসা বা নিন্দা প্রকাশ করে।', ex:'<b>نِعْمَ، بِئْسَ</b>' },
+      ],
+      quiz:{ prompt:"এই ফি'লটি কোন বিশেষ শ্রেণির?", choices:[
+        { type:'naq', ar:'نَاقِصَة', bn:'নাকিসা' },{ type:'muq', ar:'مُقَارَبَة', bn:'মুকারাবা' },
+        { type:'qul', ar:'قُلُوب', bn:'কুলূব' },{ type:'mad', ar:'مَدْح', bn:'প্রশংসা-নিন্দা' }],
+        words:[
+          { ar:'كَانَ',   type:'naq', gloss:'ছিল',         why:'كَانَ ও তার বোনেরা — আফʿআল নাকিসা।' },
+          { ar:'كَادَ',   type:'muq', gloss:'প্রায় হয়ে গেল', why:'কাজ ঘটার নিকটবর্তী — মুকারাবা।' },
+          { ar:'ظَنَّ',   type:'qul', gloss:'ধারণা করল',   why:'মনের কাজ — আফʿআল কুলূব।' },
+          { ar:'نِعْمَ',   type:'mad', gloss:'কত ভালো',     why:'প্রশংসা প্রকাশ করে — মদহ।' },
+          { ar:'أَصْبَحَ', type:'naq', gloss:'সকালে হলো',    why:'كَانَ-জাতীয় — আফʿআল নাকিসা।' },
+          { ar:'عَسَى',   type:'muq', gloss:'আশা করা যায়',  why:'নিকটবর্তী/আশা — মুকারাবা।' },
+          { ar:'عَلِمَ',   type:'qul', gloss:'জানল',        why:'মনের কাজ — আফʿআল কুলূব।' },
+          { ar:'بِئْسَ',   type:'mad', gloss:'কত নিকৃষ্ট',   why:'নিন্দা প্রকাশ করে — যম্ম।' },
+        ] },
+    },
+  ];
+
+  function renderFilSteps(){
+    const BN=['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+    const bn = n => String(n).split('').map(d=>BN[+d]).join('');
+    const host = document.getElementById('fil-steps');
+    const dots = document.getElementById('fil-stepdots');
+    const fill = document.getElementById('fil-stepfill');
+    const count = document.getElementById('fil-stepcount');
+    const N = FIL_STEPS.length;
+
+    FIL_STEPS.forEach((s,i)=>{
+      const cardCls = s.cards.length>=3 ? (s.cards.length===4?'two':'three') : 'two';
+      const step = document.createElement('div');
+      step.className = 'step';
+      step.innerHTML = `
+        <div class="section-label">${s.kicker}</div>
+        <h2 class="step-title">${s.title}</h2>
+        <p class="sub" style="text-align:center;margin-top:6px">${s.sub}</p>
+        <div class="cards ${cardCls}" style="margin-top:20px">
+          ${s.cards.map(c=>`<div class="card static"><div class="tag">${c.tag}</div><h3>${c.h3}</h3><p>${c.p}</p><div class="ex">${c.ex}</div></div>`).join('')}
+        </div>
+        <p class="sub" style="text-align:center;margin:22px 0 -6px">↓ ${s.hint}</p>
+        <div class="quiz" id="quiz-fil-${i}"></div>
+        <div class="step-nav">
+          <button class="step-prev"${i===0?' disabled':''}>← আগের ধাপ</button>
+          <button class="step-next">${i===N-1?'সম্পন্ন ✓':'পরের ধাপ →'}</button>
+        </div>`;
+      host.appendChild(step);
+      makeQuiz(`quiz-fil-${i}`, s.quiz);
+      const d = document.createElement('button');
+      d.className='step-dot'; d.dataset.go=i; d.title=`ধাপ ${bn(i+1)}`;
+      dots.appendChild(d);
+    });
+
+    const stepEls=[...host.querySelectorAll('.step')];
+    const dotEls=[...dots.querySelectorAll('.step-dot')];
+    let cur=-1;
+
+    function go(i){
+      if(i>=N){ show('view-home'); return; }
+      if(i<0) return;
+      cur=i;
+      stepEls.forEach((el,idx)=>el.classList.toggle('active', idx===i));
+      dotEls.forEach((el,idx)=>{ el.classList.toggle('active', idx===i); el.classList.toggle('done', idx<i); });
+      fill.style.width=(i/(N-1)*100)+'%';
+      count.textContent=`ধাপ ${bn(i+1)} / ${bn(N)}`;
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+
+    host.addEventListener('click', e=>{
+      if(e.target.classList.contains('step-next')) go(cur+1);
+      else if(e.target.classList.contains('step-prev')) go(cur-1);
+    });
+    dots.addEventListener('click', e=>{ const b=e.target.closest('.step-dot'); if(b) go(+b.dataset.go); });
+    go(0);
+    return go;
+  }
+  const filGo = renderFilSteps();
+
+  /* ---------- view navigation ---------- */
+  function show(id){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+  function wireCard(cardId, viewId){
+    const card = document.getElementById(cardId);
+    card.addEventListener('click', ()=>show(viewId));
+    card.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); show(viewId); } });
+  }
+  wireCard('ism-card', 'view-ism');
+  wireCard('fil-card', 'view-fil');
+  document.getElementById('fil-card').addEventListener('click', ()=>filGo(0));
+  document.getElementById('ism-back').addEventListener('click', ()=>show('view-home'));
+  document.getElementById('fil-back').addEventListener('click', ()=>show('view-home'));
+</script>
+</body>
+</html>
