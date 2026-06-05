@@ -199,6 +199,20 @@
   .word.swap { opacity: 0; transform: translateY(10px); }
   .gloss { text-align:center; color: var(--ink-soft); font-size:0.9rem; min-height:1.2em; margin-bottom: 24px; }
 
+  /* ---------- sentence quiz (i'rab) ---------- */
+  .sentence {
+    text-align:center; font-family:'Amiri', serif; direction:rtl;
+    font-size: clamp(1.9rem, 7vw, 2.8rem); color: var(--teal-deep);
+    line-height: 1.95; padding: 0.15em 0.2em; margin: 0; min-height: 1.6em;
+    transition: opacity .25s, transform .25s;
+  }
+  .sentence.swap { opacity:0; transform: translateY(10px); }
+  .sentence mark.tgt {
+    background: rgba(181,138,60,0.2); color: var(--rust);
+    border-bottom: 2.5px solid var(--gold); border-radius: 5px;
+    padding: 0 0.12em; box-decoration-break: clone; -webkit-box-decoration-break: clone;
+  }
+
   .choices { display:grid; gap: 12px; }
   @media (min-width: 520px){ .choices.c3 { grid-template-columns: repeat(3,1fr); } }
   @media (min-width: 520px){ .choices.c2 { grid-template-columns: repeat(2,1fr); } }
@@ -270,7 +284,7 @@
     box-shadow:0 4px 14px -6px var(--shadow);
     transition:background .2s, transform .12s, opacity .2s;
   }
-  body.fil-active #fil-burger, body.harf-active #harf-burger, body.ism-active #ism-burger { display:block; }
+  body.fil-active #fil-burger, body.harf-active #harf-burger, body.ism-active #ism-burger, body.murab-active #murab-burger { display:block; }
   .burger:hover { background:rgba(31,94,87,.08); transform:translateY(-1px); }
   /* hide burger while drawer is open so it doesn't cover the drawer heading */
   body.drawer-open .burger { opacity:0; pointer-events:none; }
@@ -429,6 +443,28 @@
     <div id="ism-summary" class="fil-summary"></div>
   </section>
 
+  <!-- ============ ISM → MUʿRAB DRILL-DOWN ============ -->
+  <section class="view" id="view-ism-murab">
+    <div class="fil-topbar">
+      <button class="back" id="murab-back">← ইসমের প্রকারভেদে ফিরে যাও</button>
+    </div>
+    <header style="margin-bottom:8px">
+      <div class="eyebrow">إِعْرَابُ الِاسْم</div>
+      <div class="ornament"><span>✦</span></div>
+      <h1>মুʿরাবের প্রকার — ইসমের ইʿরাব</h1>
+      <p class="sub">মুʿরাব ইসম বাক্যে ভূমিকা অনুযায়ী শেষ বদলায়। ধাপে ধাপে — অবস্থা, হরফে চিহ্ন ও অনুমিত চিহ্ন।</p>
+    </header>
+
+    <div class="step-head">
+      <div class="step-count" id="murab-stepcount"></div>
+      <div class="step-bar"><i id="murab-stepfill"></i></div>
+      <div class="step-dots" id="murab-stepdots"></div>
+    </div>
+
+    <div id="murab-steps"></div>
+    <div id="murab-summary" class="fil-summary"></div>
+  </section>
+
   <!-- ============ FIL VIEW ============ -->
   <section class="view" id="view-fil">
     <div class="fil-topbar">
@@ -502,6 +538,14 @@
   <div class="drawer-head">ইসমের প্রকারভেদ</div>
   <div class="drawer-sub">যেকোনো ধাপে যেতে নাম বেছে নাও</div>
   <nav id="ism-drawer-list"></nav>
+</aside>
+
+<button class="burger" id="murab-burger" aria-label="মেনু">☰</button>
+<div class="drawer-backdrop" id="murab-backdrop"></div>
+<aside class="drawer" id="murab-drawer">
+  <div class="drawer-head">ইসমের ইʿরাব</div>
+  <div class="drawer-sub">যেকোনো ধাপে যেতে নাম বেছে নাও</div>
+  <nav id="murab-drawer-list"></nav>
 </aside>
 
 <script>
@@ -739,7 +783,100 @@
     render();
   }
 
-  /* ---------- quiz 2: ism — three attributes at once ---------- */
+  /* ---------- sentence quiz engine (i'rab in context) ---------- */
+  function makeSentenceQuiz(rootId, config){
+    const root = document.getElementById(rootId);
+    const unit = config.unit || 'বাক্য';
+    const colClass = config.choices.length === 2 ? 'c2' : config.choices.length === 4 ? 'c4' : 'c3';
+    root.innerHTML = `
+      <div class="quiz-top">
+        <span class="counter"></span>
+        <span class="score"></span>
+      </div>
+      <div class="bar"><i></i></div>
+      <div class="play">
+        <p class="prompt">${config.prompt}</p>
+        <div class="sentence">—</div>
+        <div class="gloss"></div>
+        <div class="choices ${colClass}">
+          ${config.choices.map(c=>`<button class="choice" data-type="${c.type}"><span class="ar">${c.ar}</span>${c.bn}</button>`).join('')}
+        </div>
+        <div class="feedback"></div>
+        <button class="next">পরের ${unit} →</button>
+      </div>
+      <div class="result">
+        <div class="label">তোমার ফলাফল</div>
+        <div class="big"></div>
+        <p class="msg"></p>
+        <button class="retry">আবার চেষ্টা করো ↺</button>
+      </div>`;
+
+    const NAME = {}; config.choices.forEach(c => NAME[c.type] = c.bn);
+    const items = config.items;
+    const q = s => root.querySelector(s);
+    const choiceEls = [...root.querySelectorAll('.choice')];
+    const sentEl = q('.sentence'), glossEl = q('.gloss'), fb = q('.feedback');
+    const nextBtn = q('.next'), counter = q('.counter'), score = q('.score');
+    const barFill = q('.bar > i'), play = q('.play'), result = q('.result');
+
+    let i = 0, correct = 0, answered = false;
+
+    function paint(it){
+      const before = it.before ? `<span>${it.before}</span> ` : '';
+      const after  = it.after  ? ` <span>${it.after}</span>` : '';
+      return `${before}<mark class="tgt">${it.target}</mark>${after}`;
+    }
+    function render(){
+      answered = false;
+      const it = items[i];
+      sentEl.classList.add('swap');
+      setTimeout(()=>{ sentEl.innerHTML = paint(it); glossEl.textContent=''; sentEl.classList.remove('swap'); }, 180);
+      counter.textContent = `${unit} ${i+1} / ${items.length}`;
+      score.textContent = `সঠিক ${correct}`;
+      barFill.style.width = (i/items.length*100) + '%';
+      choiceEls.forEach(c=>{ c.disabled=false; c.className='choice'; });
+      fb.className='feedback'; fb.innerHTML='';
+      nextBtn.classList.remove('show');
+    }
+    function answer(btn){
+      if(answered) return; answered = true;
+      const it = items[i], picked = btn.dataset.type, right = it.type;
+      choiceEls.forEach(c=>{
+        c.disabled = true;
+        if(c.dataset.type === right) c.classList.add('correct');
+        else if(c === btn) c.classList.add('wrong');
+        else c.classList.add('dim');
+      });
+      glossEl.textContent = '“' + it.gloss + '”';
+      if(picked === right){ correct++; fb.innerHTML = `<b>সঠিক!</b> ${it.why}`; }
+      else fb.innerHTML = `<b>আবার দেখো —</b> এটি <b>${NAME[right]}</b>। ${it.why}`;
+      fb.classList.add('show');
+      score.textContent = `সঠিক ${correct}`;
+      nextBtn.classList.add('show');
+    }
+    function next(){ i++; if(i >= items.length){ finish(); return; } render(); }
+    function finish(){
+      barFill.style.width = '100%';
+      play.style.display = 'none';
+      result.classList.add('show');
+      result.querySelector('.big').textContent = `${correct}/${items.length}`;
+      const pct = correct/items.length;
+      let m;
+      if(pct === 1) m = 'মাশাআল্লাহ! ইʿরাব পুরোপুরি ধরে ফেলেছ।';
+      else if(pct >= 0.7) m = 'খুব ভালো! প্রায় সবই ঠিক।';
+      else if(pct >= 0.4) m = 'ভালো শুরু। উপরের অবস্থাগুলো আরেকবার দেখে নাও।';
+      else m = 'চিন্তা নেই — উপরের কার্ডগুলো আবার পড়ে আবার চেষ্টা করো।';
+      result.querySelector('.msg').textContent = m;
+    }
+    function restart(){ i=0; correct=0; result.classList.remove('show'); play.style.display='block'; render(); }
+
+    choiceEls.forEach(c => c.addEventListener('click', ()=>answer(c)));
+    nextBtn.addEventListener('click', next);
+    result.querySelector('.retry').addEventListener('click', restart);
+    render();
+    return { restart };
+  }
+
   /* ---------- ism page: classification steps ---------- */
   const ISM_STEPS = [
     {
@@ -840,7 +977,7 @@
       sub:'বাক্যে অবস্থান বদলালে শেষের হরকত বদলায় কি না।',
       hint:'এই ইসমটি মুʿরাব না মাবনি?',
       cards:[
-        { tag:'مُعْرَب', h3:'মুʿরাব · পরিবর্তনশীল', p:'অবস্থা অনুযায়ী শেষ হরকত বদলায়।', ex:'<b>كِتَابٌ · كِتَابًا · كِتَابٍ</b>' },
+        { tag:'مُعْرَب', h3:'মুʿরাব · পরিবর্তনশীল', p:'অবস্থা অনুযায়ী শেষ হরকত বদলায়।', ex:'<b>كِتَابٌ · كِتَابًا · كِتَابٍ</b>', link:'view-ism-murab', more:'ইʿরাবের প্রকার দেখো' },
         { tag:'مَبْنِي', h3:'মাবনি · স্থির', p:'সবসময় এক হরকতে থাকে, বদলায় না।', ex:'<b>هُوَ · هٰذَا · الَّذِي</b>' },
       ],
       quiz:{ prompt:'এই ইসমটি মুʿরাব না মাবনি?', choices:[
@@ -1289,7 +1426,12 @@
         <h2 class="step-title">${s.title}</h2>
         <p class="sub" style="text-align:center;margin-top:6px">${s.sub}</p>
         <div class="cards ${cardCls}" style="margin-top:20px">
-          ${s.cards.map(c=>`<div class="card static"><div class="tag">${c.tag}</div><h3>${c.h3}</h3><p>${c.p}</p><div class="ex">${c.ex}</div></div>`).join('')}
+          ${s.cards.map(c=>{
+            const cls = c.link ? 'card clickable' : 'card static';
+            const dl  = c.link ? ` data-link="${c.link}"` : '';
+            const more = c.link ? `<span class="more">${c.more || 'বিস্তারিত'} →</span>` : '';
+            return `<div class="${cls}"${dl}><div class="tag">${c.tag}</div><h3>${c.h3}</h3><p>${c.p}</p><div class="ex">${c.ex}</div>${more}</div>`;
+          }).join('')}
         </div>
         <p class="sub" style="text-align:center;margin:22px 0 -6px">↓ ${s.hint}</p>
         <div class="quiz" id="quiz-${prefix}-${i}"></div>
@@ -1298,7 +1440,8 @@
           <button class="step-next">${i===N-1?'সম্পন্ন ✓':'পরের ধাপ →'}</button>
         </div>`;
       host.appendChild(step);
-      if(s.multi) makeMultiQuiz(`quiz-${prefix}-${i}`, s.quiz);
+      if(s.sentence) makeSentenceQuiz(`quiz-${prefix}-${i}`, s.quiz);
+      else if(s.multi) makeMultiQuiz(`quiz-${prefix}-${i}`, s.quiz);
       else makeQuiz(`quiz-${prefix}-${i}`, s.quiz);
       const d = document.createElement('button');
       d.className='step-dot'; d.dataset.go=i; d.title=`ধাপ ${bn(i+1)}`;
@@ -1363,6 +1506,8 @@
     }
 
     host.addEventListener('click', e=>{
+      const link = e.target.closest('.card[data-link]');
+      if(link){ show(link.dataset.link); return; }
       if(e.target.classList.contains('step-next')) go(cur+1);
       else if(e.target.classList.contains('step-prev')) go(cur-1);
     });
@@ -1385,8 +1530,9 @@
     document.body.classList.toggle('ism-active',  id==='view-ism');
     document.body.classList.toggle('fil-active',  id==='view-fil');
     document.body.classList.toggle('harf-active', id==='view-harf');
+    document.body.classList.toggle('murab-active', id==='view-ism-murab');
     // close any open drawer when switching views
-    ['ism','fil','harf'].forEach(p=>{
+    ['ism','fil','harf','murab'].forEach(p=>{
       document.getElementById(`${p}-drawer`).classList.remove('open');
       document.getElementById(`${p}-backdrop`).classList.remove('open');
     });
@@ -1407,6 +1553,100 @@
   document.getElementById('ism-back').addEventListener('click', ()=>show('view-home'));
   document.getElementById('fil-back').addEventListener('click', ()=>show('view-home'));
   document.getElementById('harf-back').addEventListener('click', ()=>show('view-home'));
+
+  /* ---------- ism → মুʿরাব drill-down (i'rab of ism) — own stepper ---------- */
+  const MURAB_STEPS = [
+    {
+      kicker:'১ · অবস্থা ও আসল চিহ্ন', title:'মারফূʿ · মানসূব · মাজরূর',
+      sub:'বাক্যে ভূমিকা ঠিক করে অবস্থা — সাধারণ ইসমে তা হারাকাত দিয়েই দেখা যায়।',
+      hint:'চিহ্নিত শব্দটি কোন অবস্থায়, বলো তো',
+      cards:[
+        { tag:'مَرْفُوع', h3:'মারফূʿ · পেশ (ضمة)', p:'কর্তা, মুবতাদা বা খবর হলে।', ex:'<b>جَاءَ زَيْدٌ</b> — যায়েদ এলো' },
+        { tag:'مَنْصُوب', h3:'মানসূব · যবর (فتحة)', p:'মাফউল (কর্ম) হলে।', ex:'<b>رَأَيْتُ زَيْدًا</b> — যায়েদকে দেখলাম' },
+        { tag:'مَجْرُور', h3:'মাজরূর · যের (كسرة)', p:'জার-এর পরে বা মুদাফ ইলাইহি হলে।', ex:'<b>مَرَرْتُ بِزَيْدٍ</b> — যায়েদের পাশ দিয়ে' },
+      ],
+      sentence:true,
+      quiz:{ prompt:'চিহ্নিত শব্দটি কোন অবস্থায়?', unit:'বাক্য', choices:[
+        { type:'marfu', ar:'مَرْفُوع', bn:'মারফূʿ' },{ type:'mansub', ar:'مَنْصُوب', bn:'মানসূব' },{ type:'majrur', ar:'مَجْرُور', bn:'মাজরূর' }],
+        items:[
+          { before:'جَاءَ',          target:'مُحَمَّدٌ',   after:'',        gloss:'মুহাম্মদ এলো',        type:'marfu',  why:'এলো কে? কর্তা (ফাইল) — মারফূʿ, শেষে পেশ।' },
+          { before:'رَأَيْتُ',        target:'مُحَمَّدًا',  after:'',        gloss:'মুহাম্মদকে দেখলাম',    type:'mansub', why:'দেখলাম কাকে? মাফউল (কর্ম) — মানসূব, শেষে যবর।' },
+          { before:'مَرَرْتُ',        target:'بِمُحَمَّدٍ', after:'',        gloss:'মুহাম্মদের পাশ দিয়ে গেলাম', type:'majrur', why:'জার <span class="ar">بِ</span> এর পরের ইসম — মাজরূর, শেষে যের।' },
+          { before:'',              target:'الْكِتَابُ',  after:'جَدِيدٌ',  gloss:'বইটি নতুন',           type:'marfu',  why:'মুবতাদা (উদ্দেশ্য) — মারফূʿ, শেষে পেশ।' },
+          { before:'كَتَبَ الْوَلَدُ', target:'الدَّرْسَ',   after:'',        gloss:'ছেলেটি পড়াটি লিখল',    type:'mansub', why:'কী লিখল? মাফউল — মানসূব, শেষে যবর।' },
+          { before:'الْكِتَابُ فِي',   target:'الْحَقِيبَةِ', after:'',        gloss:'বইটি ব্যাগে',         type:'majrur', why:'জার <span class="ar">فِي</span> এর পরে — মাজরূর, শেষে যের।' },
+          { before:'هٰذَا كِتَابُ',    target:'اللهِ',       after:'',        gloss:'এটি আল্লাহর কিতাব',     type:'majrur', why:'মুদাফ ইলাইহি — মাজরূর, শেষে যের।' },
+          { before:'ذَهَبَ',         target:'الْوَلَدُ',    after:'',        gloss:'ছেলেটি গেল',          type:'marfu',  why:'কর্তা (ফাইল) — মারফূʿ, শেষে পেশ।' },
+        ] },
+    },
+    {
+      kicker:'২ · ফরয়ী চিহ্ন — হুরূফ', title:'হরফ দিয়ে ইʿরাব (নিয়াবত)',
+      sub:'কিছু ইসমে হারাকাতের বদলে হরফই ইʿরাবের চিহ্ন হয়।',
+      hint:'এই শব্দটি কোন দলের?',
+      cards:[
+        { tag:'مُثَنَّى', h3:'মুসান্না', p:'রফা <b style="font-family:Amiri">ا</b> · নসব-জার <b style="font-family:Amiri">ي</b>।', ex:'<b>مُسْلِمَانِ / مُسْلِمَيْنِ</b>' },
+        { tag:'جَمْع مُذَكَّر', h3:'জমʿ মুযাক্কার সালিম', p:'রফা <b style="font-family:Amiri">و</b> · নসব-জার <b style="font-family:Amiri">ي</b>।', ex:'<b>مُسْلِمُونَ / مُسْلِمِينَ</b>' },
+        { tag:'أَسْمَاء خَمْسَة', h3:'আসমায়ে খামসা', p:'রফা <b style="font-family:Amiri">و</b> · নসব <b style="font-family:Amiri">ا</b> · জার <b style="font-family:Amiri">ي</b>।', ex:'<b>أَبُوكَ / أَبَاكَ / أَبِيكَ</b>' },
+      ],
+      quiz:{ prompt:'এই শব্দটি কোন দলের (হরফ দিয়ে ইʿরাব)?', choices:[
+        { type:'muthanna', ar:'مُثَنَّى', bn:'মুসান্না' },{ type:'jamʿ', ar:'جَمْع', bn:'জমʿ সালিম' },{ type:'khamsa', ar:'خَمْسَة', bn:'আসমায়ে খামসা' }],
+        words:[
+          { ar:'مُسْلِمَانِ',    type:'muthanna', gloss:'দুই মুসলিম (রফা)', why:'শেষে <span class="ar">ـَانِ</span> — মুসান্না, রফা আলিফ দিয়ে।' },
+          { ar:'الْمُؤْمِنُونَ',  type:'jamʿ',     gloss:'মুমিনগণ (রফা)',    why:'শেষে <span class="ar">ـُونَ</span> — জমʿ মুযাক্কার সালিম, রফা ওয়াও দিয়ে।' },
+          { ar:'أَخُوكَ',       type:'khamsa',   gloss:'তোমার ভাই (রফা)',  why:'<span class="ar">أخ</span> — আসমায়ে খামসা, রফা ওয়াও দিয়ে।' },
+          { ar:'مُسْلِمَيْنِ',   type:'muthanna', gloss:'দুই মুসলিম (নসব/জার)', why:'শেষে <span class="ar">ـَيْنِ</span> (যবর-ই) — মুসান্না, নসব/জার ইয়া দিয়ে।' },
+          { ar:'الصَّالِحِينَ',  type:'jamʿ',     gloss:'সৎগণ (নসব/জার)',   why:'শেষে <span class="ar">ـِينَ</span> (যের-ই) — জমʿ সালিম, নসব/জার ইয়া দিয়ে।' },
+          { ar:'ذُو مَالٍ',     type:'khamsa',   gloss:'সম্পদশালী (রফা)',  why:'<span class="ar">ذو</span> — আসমায়ে খামসা, রফা ওয়াও দিয়ে।' },
+          { ar:'مُعَلِّمَانِ',   type:'muthanna', gloss:'দুই শিক্ষক (রফা)', why:'শেষে <span class="ar">ـَانِ</span> — মুসান্না।' },
+          { ar:'الْكَافِرِينَ',  type:'jamʿ',     gloss:'কাফিরগণ (নসব/জার)', why:'শেষে <span class="ar">ـِينَ</span> — জমʿ মুযাক্কার সালিম।' },
+        ] },
+    },
+    {
+      kicker:'৩ · অনুমিত চিহ্ন — মুকাদ্দার', title:'মাকসূর / মানকূস',
+      sub:'শেষ হরফ দুর্বল হওয়ায় চিহ্ন উচ্চারিত হয় না — অনুমান করা হয়।',
+      hint:'এই শব্দের ইʿরাব মাকসূরের মতো না মানকূসের মতো?',
+      cards:[
+        { tag:'مَقْصُور', h3:'মাকসূর', p:'শেষে স্থির <b style="font-family:Amiri">ا</b> — তিন অবস্থাই অনুমিত (তাআযযুর)।', ex:'<b>مُوسَى · الْفَتَى</b>' },
+        { tag:'مَنْقُوص', h3:'মানকূস', p:'শেষে <b style="font-family:Amiri">ي</b> — রফা ও জার অনুমিত, নসব দৃশ্যমান (যবর)।', ex:'<b>الْقَاضِي · الْقَاضِيَ</b>' },
+      ],
+      quiz:{ prompt:'এই শব্দটি মাকসূর না মানকূস?', choices:[
+        { type:'maqsur', ar:'مَقْصُور', bn:'মাকসূর' },{ type:'manqus', ar:'مَنْقُوص', bn:'মানকূস' }],
+        words:[
+          { ar:'مُوسَى',       type:'maqsur', gloss:'মূসা',        why:'শেষে স্থির আলিফ — মাকসূর, তিন অবস্থাই অনুমিত।' },
+          { ar:'الْقَاضِي',    type:'manqus', gloss:'বিচারক',      why:'শেষে যেরযুক্ত ইয়া — মানকূস, রফা-জার অনুমিত।' },
+          { ar:'الْفَتَى',     type:'maqsur', gloss:'যুবক',        why:'শেষে স্থির আলিফ — মাকসূর।' },
+          { ar:'الدَّاعِي',    type:'manqus', gloss:'আহ্বানকারী',  why:'শেষে ইয়া — মানকূস।' },
+          { ar:'الْمُسْتَشْفَى', type:'maqsur', gloss:'হাসপাতাল',    why:'শেষে স্থির আলিফ — মাকসূর।' },
+          { ar:'الْمُحَامِي',   type:'manqus', gloss:'উকিল',        why:'শেষে ইয়া — মানকূস।' },
+          { ar:'الْهُدَى',     type:'maqsur', gloss:'হেদায়াত',     why:'শেষে স্থির আলিফ — মাকসূর।' },
+          { ar:'الرَّاعِي',    type:'manqus', gloss:'রাখাল',       why:'শেষে ইয়া — মানকূস।' },
+        ] },
+    },
+    {
+      kicker:'৪ · মিশ্র অনুশীলন', title:'চিহ্ন কোন উপায়ে এসেছে?',
+      sub:'শব্দ দেখে বলো — হারাকাত, হুরূফ না মুকাদ্দার।',
+      hint:'এই শব্দের ইʿরাব কীভাবে এসেছে?',
+      cards:[
+        { tag:'بِالْحَرَكَات', h3:'হারাকাত দিয়ে', p:'সাধারণ ইসম — পেশ/যবর/যের দৃশ্যমান।', ex:'<b>مُسْلِمٌ · مُسْلِمًا · مُسْلِمٍ</b>' },
+        { tag:'بِالْحُرُوف', h3:'হরফ দিয়ে', p:'মুসান্না, জমʿ সালিম, আসমায়ে খামসা।', ex:'<b>مُسْلِمُونَ · أَبُوكَ</b>' },
+        { tag:'مُقَدَّرَة', h3:'অনুমিত (মুকাদ্দার)', p:'মাকসূর ও মানকূস।', ex:'<b>مُوسَى · الْقَاضِي</b>' },
+      ],
+      quiz:{ prompt:'এই শব্দের ইʿরাব কীভাবে প্রকাশ পেয়েছে?', choices:[
+        { type:'harakat', ar:'حَرَكَة', bn:'হারাকাত' },{ type:'huruf', ar:'حُرُوف', bn:'হুরূফ' },{ type:'muqaddar', ar:'تَقْدِير', bn:'মুকাদ্দার' }],
+        words:[
+          { ar:'الْمُسْلِمُونَ', type:'huruf',    gloss:'মুসলিমগণ (রফা)',  why:'জমʿ মুযাক্কার সালিম — রফা <span class="ar">ـُونَ</span>, হরফ দিয়ে।' },
+          { ar:'مُسْلِمٌ',       type:'harakat',  gloss:'একজন মুসলিম',     why:'সাধারণ ইসম — পেশ দৃশ্যমান, হারাকাত দিয়ে।' },
+          { ar:'مُوسَى',        type:'muqaddar', gloss:'মূসা',            why:'মাকসূর — তিন অবস্থাই অনুমিত, মুকাদ্দার।' },
+          { ar:'الزَّيْدَانِ',   type:'huruf',    gloss:'দুই যায়েদ (রফা)',  why:'মুসান্না — রফা <span class="ar">ـَانِ</span>, হরফ দিয়ে।' },
+          { ar:'الْقَاضِي',     type:'muqaddar', gloss:'বিচারক',          why:'মানকূস — রফা ও জার অনুমিত, মুকাদ্দার।' },
+          { ar:'كِتَابًا',      type:'harakat',  gloss:'একটি বই (নসব)',   why:'সাধারণ ইসম — যবর দৃশ্যমান, হারাকাত দিয়ে।' },
+          { ar:'أَبُوكَ',       type:'huruf',    gloss:'তোমার বাবা (রফা)', why:'আসমায়ে খামসা — রফা <span class="ar">و</span>, হরফ দিয়ে।' },
+          { ar:'رَجُلٍ',        type:'harakat',  gloss:'একজন লোক (জার)',  why:'সাধারণ ইসম — যের দৃশ্যমান, হারাকাত দিয়ে।' },
+        ] },
+    },
+  ];
+  makeStepper({ prefix:'murab', steps:MURAB_STEPS, summaryTitle:'ইসমের ইʿরাব — এক নজরে' });
+  document.getElementById('murab-back').addEventListener('click', ()=>show('view-ism'));
 </script>
 </body>
 </html>
