@@ -37,9 +37,6 @@
           <button class="step-next">${i===N-1?'সম্পন্ন ✓':'পরের ধাপ →'}</button>
         </div>`;
       host.appendChild(step);
-      if(s.sentence) makeSentenceQuiz(`quiz-${prefix}-${i}`, s.quiz);
-      else if(s.multi) makeMultiQuiz(`quiz-${prefix}-${i}`, s.quiz);
-      else makeQuiz(`quiz-${prefix}-${i}`, s.quiz);
       const d = document.createElement('button');
       d.className='step-dot'; d.dataset.go=i; d.title=`ধাপ ${bn(i+1)}`;
       dots.appendChild(d);
@@ -63,6 +60,17 @@
         <button class="step-next" id="${prefix}-sum-home">🏠 কালিমায় ফিরে যাও</button>
       </div>`;
 
+    // quizzes build lazily — only when a step is first shown (see go → buildQuiz)
+    const quizBuilt = new Array(N).fill(false);
+    function buildQuiz(i){
+      if(quizBuilt[i]) return;
+      quizBuilt[i] = true;
+      const s = steps[i];
+      if(s.sentence) makeSentenceQuiz(`quiz-${prefix}-${i}`, s.quiz);
+      else if(s.multi) makeMultiQuiz(`quiz-${prefix}-${i}`, s.quiz);
+      else makeQuiz(`quiz-${prefix}-${i}`, s.quiz);
+    }
+
     const stepEls=[...host.querySelectorAll('.step')];
     const dotEls=[...dots.querySelectorAll('.step-dot')];
     let cur=-1;
@@ -80,6 +88,7 @@
         return;
       }
       if(i<0) return;
+      buildQuiz(i);
       summary.classList.remove('show');
       cur=i;
       stepEls.forEach((el,idx)=>el.classList.toggle('active', idx===i));

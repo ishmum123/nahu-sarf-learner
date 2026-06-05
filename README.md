@@ -92,10 +92,15 @@ A card inside any step opts into a drill-down just by carrying a `link`:
 { tag:'مَرْفُوع', h3:'মারফূʿ …', p:'…', ex:'…', link:'ism.murab.marfu', more:'মারফূʿর প্রকার' }
 ```
 
-At load, `buildPages()` generates one `<section>` per registry entry, runs
-`makeStepper` on each, and wires a shared breadcrumb + drawer. **Adding a new nested
-page anywhere in the tree is therefore one data entry + one `link:` on a parent card —
-no HTML, no CSS, no routing code.**
+At load, `buildPages()` generates one lightweight `<section>` shell per registry entry
+and wires the shared breadcrumb + drawer. **Adding a new nested page anywhere in the tree
+is therefore one data entry + one `link:` on a parent card — no HTML, no CSS, no routing
+code.**
+
+**Lazy by default.** A page's steps and quizzes are built by `makeStepper` only on first
+visit (`show` → `ensureBuilt`), and within a page each step's quiz is built only when that
+step is first shown. So booting the app costs just the home quiz; unopened pages and
+unseen steps cost nothing.
 
 ### Quiz types
 

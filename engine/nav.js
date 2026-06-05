@@ -42,15 +42,26 @@
   function openDrawer(){ DRAWER.classList.add('open'); BACKDROP.classList.add('open'); document.body.classList.add('drawer-open'); }
   function closeDrawer(){ DRAWER.classList.remove('open'); BACKDROP.classList.remove('open'); document.body.classList.remove('drawer-open'); }
 
+  // ----- lazy page build: makeStepper (steps + per-step quizzes) runs on first visit, then cached -----
+  function ensureBuilt(id){
+    if(PAGE_API[id]) return;
+    const p = PAGES[id];
+    PAGE_API[id] = makeStepper({
+      prefix: domId(id), steps: p.steps, summaryTitle: p.summaryTitle,
+      onStep: i => { if(activeId === id) highlightDrawer(i); },
+    });
+  }
+
   // ----- view switching. reset=true restarts the page at step 1 (forward nav); false keeps its place (breadcrumb / back) -----
   function show(id, reset=true){
     activeId = id;
+    if(id !== null) ensureBuilt(id);
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.getElementById(viewId(id)).classList.add('active');
     document.body.classList.toggle('page-view', id !== null);
     closeDrawer();
     if(id !== null){
-      if(reset && PAGE_API[id]) PAGE_API[id].go(0);
+      if(reset) PAGE_API[id].go(0);
       buildDrawer(id);
     }
     window.scrollTo({ top:0, behavior:'smooth' });
@@ -83,15 +94,6 @@
         <div id="${dom}-steps"></div>
         <div id="${dom}-summary" class="fil-summary"></div>`;
       WRAP.insertBefore(sec, footer);
-    });
-
-    // init steppers after every section exists (so cross-page links resolve)
-    ids.forEach(id => {
-      const p = PAGES[id];
-      PAGE_API[id] = makeStepper({
-        prefix: domId(id), steps: p.steps, summaryTitle: p.summaryTitle,
-        onStep: i => { if(activeId === id) highlightDrawer(i); },
-      });
     });
 
     // shared chrome
