@@ -270,7 +270,7 @@
     box-shadow:0 4px 14px -6px var(--shadow);
     transition:background .2s, transform .12s, opacity .2s;
   }
-  body.fil-active #fil-burger, body.harf-active #harf-burger { display:block; }
+  body.fil-active #fil-burger, body.harf-active #harf-burger, body.ism-active #ism-burger { display:block; }
   .burger:hover { background:rgba(31,94,87,.08); transform:translateY(-1px); }
   /* hide burger while drawer is open so it doesn't cover the drawer heading */
   body.drawer-open .burger { opacity:0; pointer-events:none; }
@@ -409,71 +409,24 @@
 
   <!-- ============ ISM VIEW ============ -->
   <section class="view" id="view-ism">
-    <button class="back" id="ism-back">← কালিমার প্রকারে ফিরে যাও</button>
-    <header>
+    <div class="fil-topbar">
+      <button class="back" id="ism-back">← কালিমার প্রকারে ফিরে যাও</button>
+    </div>
+    <header style="margin-bottom:8px">
       <div class="eyebrow">أَقْسَامُ الِاسْم</div>
       <div class="ornament"><span>✦</span></div>
       <h1>ইসম-এর প্রকারভেদ</h1>
-      <p class="sub">একই ইসমকে তিন দৃষ্টিকোণ থেকে ভাগ করা যায় — <b>সংখ্যা</b>, <b>লিঙ্গ</b> ও <b>নির্দিষ্টতা</b> অনুসারে।</p>
+      <p class="sub">একই ইসমকে কয়েক দৃষ্টিকোণ থেকে ভাগ করা যায় — সংখ্যা, লিঙ্গ ও নির্দিষ্টতা।</p>
     </header>
 
-    <div class="section-label">১ · সংখ্যা অনুসারে</div>
-    <div class="cards three">
-      <div class="card static">
-        <div class="tag">مُفْرَد</div>
-        <h3>মুফরাদ · একবচন</h3>
-        <p>একটি বস্তু বা ব্যক্তি বোঝায়। কোনো বিশেষ লেজ নেই।</p>
-        <div class="ex"><b>مُسْلِم</b> — একজন মুসলিম</div>
-      </div>
-      <div class="card static">
-        <div class="tag">مُثَنَّى</div>
-        <h3>মুসান্না · দ্বিবচন</h3>
-        <p>ঠিক দুইটি বোঝায়। শেষে যুক্ত হয় <b style="font-family:Amiri">ـَانِ</b> (আন)।</p>
-        <div class="ex"><b>مُسْلِمَانِ</b> — দুইজন মুসলিম</div>
-      </div>
-      <div class="card static">
-        <div class="tag">جَمْع</div>
-        <h3>জমʿ · বহুবচন</h3>
-        <p>তিন বা তার বেশি বোঝায়। যেমন শেষে <b style="font-family:Amiri">ـُونَ</b> (ঊন)।</p>
-        <div class="ex"><b>مُسْلِمُونَ</b> — অনেক মুসলিম</div>
-      </div>
+    <div class="step-head">
+      <div class="step-count" id="ism-stepcount"></div>
+      <div class="step-bar"><i id="ism-stepfill"></i></div>
+      <div class="step-dots" id="ism-stepdots"></div>
     </div>
 
-    <div class="section-label">২ · লিঙ্গ অনুসারে</div>
-    <div class="cards two">
-      <div class="card static">
-        <div class="tag">مُذَكَّر</div>
-        <h3>মুযাক্কার · পুংলিঙ্গ</h3>
-        <p>পুরুষবাচক শব্দ।</p>
-        <div class="ex"><b>مُؤْمِن</b> — মুমিন (পুরুষ)</div>
-      </div>
-      <div class="card static">
-        <div class="tag">مُؤَنَّث</div>
-        <h3>মুআন্নাস · স্ত্রীলিঙ্গ</h3>
-        <p>স্ত্রীবাচক — প্রায়ই শেষে <b style="font-family:Amiri">ة</b> (তা মারবুতা)।</p>
-        <div class="ex"><b>مُؤْمِنَة</b> — মুমিনা (নারী)</div>
-      </div>
-    </div>
-
-    <div class="section-label">৩ · নির্দিষ্টতা অনুসারে</div>
-    <div class="cards two">
-      <div class="card static">
-        <div class="tag">نَكِرَة</div>
-        <h3>নাকিরা · অনির্দিষ্ট</h3>
-        <p>সাধারণ, অনির্দিষ্ট কোনো একটি। প্রায়ই তানভীন থাকে।</p>
-        <div class="ex"><b>كِتَابٌ</b> — একটি বই</div>
-      </div>
-      <div class="card static">
-        <div class="tag">مَعْرِفَة</div>
-        <h3>মাʿরিফা · নির্দিষ্ট</h3>
-        <p>নির্দিষ্ট কোনো একটি — যেমন আগে <b style="font-family:Amiri">الْ</b> (আল-)।</p>
-        <div class="ex"><b>الْكِتَابُ</b> — সেই বইটি</div>
-      </div>
-    </div>
-
-    <div class="section-label">পরীক্ষা · তিনটাই একসাথে</div>
-    <p class="sub" style="text-align:center;margin:-6px 0 0">একটি শব্দ দেখে তার <b>সংখ্যা</b>, <b>লিঙ্গ</b> ও <b>নির্দিষ্টতা</b> — তিনটাই বেছে নাও, তারপর মিলিয়ে দেখো।</p>
-    <div class="quiz" id="quiz-ism"></div>
+    <div id="ism-steps"></div>
+    <div id="ism-summary" class="fil-summary"></div>
   </section>
 
   <!-- ============ FIL VIEW ============ -->
@@ -541,6 +494,14 @@
   <div class="drawer-head">হরফের প্রকারভেদ</div>
   <div class="drawer-sub">যেকোনো দলে যেতে নাম বেছে নাও</div>
   <nav id="harf-drawer-list"></nav>
+</aside>
+
+<button class="burger" id="ism-burger" aria-label="মেনু">☰</button>
+<div class="drawer-backdrop" id="ism-backdrop"></div>
+<aside class="drawer" id="ism-drawer">
+  <div class="drawer-head">ইসমের প্রকারভেদ</div>
+  <div class="drawer-sub">যেকোনো ধাপে যেতে নাম বেছে নাও</div>
+  <nav id="ism-drawer-list"></nav>
 </aside>
 
 <script>
@@ -779,43 +740,111 @@
   }
 
   /* ---------- quiz 2: ism — three attributes at once ---------- */
-  makeMultiQuiz('quiz-ism', {
-    prompt: 'এই শব্দটির তিনটি বৈশিষ্ট্যই বেছে নাও:',
-    axes: [
-      { label:'সংখ্যা', ar:'العدد', choices:[
-        { type:'mufrad',   bn:'একবচন' },
-        { type:'muthanna', bn:'দ্বিবচন' },
-        { type:'jam',      bn:'বহুবচন' },
-      ]},
-      { label:'লিঙ্গ', ar:'الجنس', choices:[
-        { type:'muz', bn:'পুংলিঙ্গ' },
-        { type:'mua', bn:'স্ত্রীলিঙ্গ' },
-      ]},
-      { label:'নির্দিষ্টতা', ar:'التعريف', choices:[
-        { type:'nak', bn:'অনির্দিষ্ট' },
-        { type:'mar', bn:'নির্দিষ্ট' },
-      ]},
-    ],
-    // ans order matches axes: [number, gender, definiteness]
-    words: [
-      { ar:'الْمُسْلِمَانِ', gloss:'সেই দুই মুসলিম', ans:['muthanna','muz','mar'],
-        why:['শেষে <span class="ar">ـَانِ</span> (আন) — দ্বিবচন।','পুরুষবাচক, তা-মারবুতা নেই — পুংলিঙ্গ।','আগে <span class="ar">الْ</span> (আল-) — নির্দিষ্ট।'] },
-      { ar:'مُعَلِّمَةٌ', gloss:'একজন শিক্ষিকা', ans:['mufrad','mua','nak'],
-        why:['একটিমাত্র — একবচন।','শেষে <span class="ar">ة</span> (তা-মারবুতা) — স্ত্রীলিঙ্গ।','তানভীন (<span class="ar">ٌ</span>) আছে, আল- নেই — অনির্দিষ্ট।'] },
-      { ar:'الْمُؤْمِنُونَ', gloss:'সেই মুমিনগণ', ans:['jam','muz','mar'],
-        why:['শেষে <span class="ar">ـُونَ</span> (ঊন) — বহুবচন।','পুরুষবাচক — পুংলিঙ্গ।','আগে <span class="ar">الْ</span> — নির্দিষ্ট।'] },
-      { ar:'كِتَابٌ', gloss:'একটি বই', ans:['mufrad','muz','nak'],
-        why:['একটিমাত্র, কোনো লেজ নেই — একবচন।','পুরুষবাচক শব্দ — পুংলিঙ্গ।','তানভীন আছে, আল- নেই — অনির্দিষ্ট।'] },
-      { ar:'مُسْلِمَتَانِ', gloss:'দুই মুসলিমা', ans:['muthanna','mua','nak'],
-        why:['শেষে <span class="ar">ـَانِ</span> (আন) — দ্বিবচন।','মূলে <span class="ar">ة</span> আছে (মুসলিমা) — স্ত্রীলিঙ্গ।','আল- নেই — অনির্দিষ্ট।'] },
-      { ar:'الْقَلَمُ', gloss:'সেই কলমটি', ans:['mufrad','muz','mar'],
-        why:['একটিমাত্র — একবচন।','পুরুষবাচক শব্দ — পুংলিঙ্গ।','আগে <span class="ar">الْ</span> — নির্দিষ্ট।'] },
-      { ar:'صَالِحَاتٌ', gloss:'কিছু সৎ নারী', ans:['jam','mua','nak'],
-        why:['শেষে <span class="ar">ـَات</span> (আত) — বহুবচন।','<span class="ar">ـَات</span> স্ত্রীবাচক বহুবচন — স্ত্রীলিঙ্গ।','তানভীন আছে — অনির্দিষ্ট।'] },
-      { ar:'الْبِنْتُ', gloss:'সেই মেয়েটি', ans:['mufrad','mua','mar'],
-        why:['একটিমাত্র — একবচন।','অর্থেই স্ত্রীবাচক — স্ত্রীলিঙ্গ।','আগে <span class="ar">الْ</span> — নির্দিষ্ট।'] },
-    ],
-  });
+  /* ---------- ism page: classification steps ---------- */
+  const ISM_STEPS = [
+    {
+      kicker:'১ · সংখ্যা অনুসারে', title:'মুফরাদ · মুসান্না · জমʿ',
+      sub:'শব্দটি কয়টি বোঝায় — তার উপর ভিত্তি করে।',
+      hint:'শব্দের শেষ চিহ্ন দেখে বলো — একবচন, দ্বিবচন না বহুবচন?',
+      cards:[
+        { tag:'مُفْرَد', h3:'মুফরাদ · একবচন', p:'একটি বস্তু/ব্যক্তি। কোনো বিশেষ লেজ নেই।', ex:'<b>مُسْلِم</b> — একজন মুসলিম' },
+        { tag:'مُثَنَّى', h3:'মুসান্না · দ্বিবচন', p:'ঠিক দুইটি। শেষে <b style="font-family:Amiri">ـَانِ</b> (আন)।', ex:'<b>مُسْلِمَانِ</b> — দুইজন মুসলিম' },
+        { tag:'جَمْع', h3:'জমʿ · বহুবচন', p:'তিন বা বেশি। যেমন শেষে <b style="font-family:Amiri">ـُونَ</b> (ঊন)।', ex:'<b>مُسْلِمُونَ</b> — অনেক মুসলিম' },
+      ],
+      quiz:{ prompt:'এই ইসমটি সংখ্যায় কোনটি?', choices:[
+        { type:'mufrad', ar:'مُفْرَد', bn:'একবচন' },{ type:'muthanna', ar:'مُثَنَّى', bn:'দ্বিবচন' },{ type:'jam', ar:'جَمْع', bn:'বহুবচন' }],
+        words:[
+          { ar:'مُسْلِم',     type:'mufrad',   gloss:'একজন মুসলিম', why:'কোনো লেজ নেই — একবচন।' },
+          { ar:'مُسْلِمَانِ', type:'muthanna', gloss:'দুইজন মুসলিম', why:'শেষে <span class="ar">ـَانِ</span> (আন) — দ্বিবচন।' },
+          { ar:'مُؤْمِنُونَ', type:'jam',      gloss:'অনেক মুমিন',   why:'শেষে <span class="ar">ـُونَ</span> (ঊন) — বহুবচন।' },
+          { ar:'كِتَابَانِ',  type:'muthanna', gloss:'দুটি বই',      why:'শেষে <span class="ar">ـَانِ</span> (আন) — দ্বিবচন।' },
+          { ar:'قَلَم',       type:'mufrad',   gloss:'একটি কলম',     why:'একটিমাত্র, লেজ নেই — একবচন।' },
+          { ar:'مُعَلِّمُونَ', type:'jam',      gloss:'অনেক শিক্ষক',  why:'শেষে <span class="ar">ـُونَ</span> (ঊন) — বহুবচন।' },
+          { ar:'صَالِحَانِ',  type:'muthanna', gloss:'দুইজন সৎ ব্যক্তি', why:'শেষে <span class="ar">ـَانِ</span> (আন) — দ্বিবচন।' },
+          { ar:'بَيْت',       type:'mufrad',   gloss:'একটি ঘর',      why:'একটিমাত্র — একবচন।' },
+        ] },
+    },
+    {
+      kicker:'২ · লিঙ্গ অনুসারে', title:'মুযাক্কার / মুআন্নাস',
+      sub:'শব্দটি পুরুষবাচক না স্ত্রীবাচক।',
+      hint:'শব্দটি পুংলিঙ্গ না স্ত্রীলিঙ্গ?',
+      cards:[
+        { tag:'مُذَكَّر', h3:'মুযাক্কার · পুংলিঙ্গ', p:'পুরুষবাচক শব্দ।', ex:'<b>مُؤْمِن</b> — মুমিন (পুরুষ)' },
+        { tag:'مُؤَنَّث', h3:'মুআন্নাস · স্ত্রীলিঙ্গ', p:'স্ত্রীবাচক — প্রায়ই শেষে <b style="font-family:Amiri">ة</b>।', ex:'<b>مُؤْمِنَة</b> — মুমিনা (নারী)' },
+      ],
+      quiz:{ prompt:'এই ইসমটি কোন লিঙ্গের?', choices:[
+        { type:'muz', ar:'مُذَكَّر', bn:'পুংলিঙ্গ' },{ type:'mua', ar:'مُؤَنَّث', bn:'স্ত্রীলিঙ্গ' }],
+        words:[
+          { ar:'مُعَلِّم',   type:'muz', gloss:'শিক্ষক',   why:'পুরুষবাচক, তা-মারবুতা নেই — পুংলিঙ্গ।' },
+          { ar:'مُعَلِّمَة', type:'mua', gloss:'শিক্ষিকা',  why:'শেষে <span class="ar">ة</span> — স্ত্রীলিঙ্গ।' },
+          { ar:'مُؤْمِن',    type:'muz', gloss:'মুমিন (পুরুষ)', why:'পুরুষবাচক — পুংলিঙ্গ।' },
+          { ar:'مُؤْمِنَة',  type:'mua', gloss:'মুমিনা (নারী)', why:'শেষে <span class="ar">ة</span> — স্ত্রীলিঙ্গ।' },
+          { ar:'وَلَد',      type:'muz', gloss:'ছেলে',     why:'অর্থেই পুরুষবাচক — পুংলিঙ্গ।' },
+          { ar:'بِنْت',      type:'mua', gloss:'মেয়ে',     why:'তা-মারবুতা না থাকলেও অর্থেই স্ত্রীবাচক — স্ত্রীলিঙ্গ।' },
+          { ar:'مَدْرَسَة',  type:'mua', gloss:'মাদরাসা',   why:'শেষে <span class="ar">ة</span> — স্ত্রীলিঙ্গ।' },
+          { ar:'كَافِر',     type:'muz', gloss:'কাফির (পুরুষ)', why:'পুরুষবাচক — পুংলিঙ্গ।' },
+        ] },
+    },
+    {
+      kicker:'৩ · নির্দিষ্টতা অনুসারে', title:'নাকিরা / মাʿরিফা',
+      sub:'শব্দটি অনির্দিষ্ট না নির্দিষ্ট।',
+      hint:'শব্দটি অনির্দিষ্ট (তানভীন) না নির্দিষ্ট (আল-)?',
+      cards:[
+        { tag:'نَكِرَة', h3:'নাকিরা · অনির্দিষ্ট', p:'সাধারণ, অনির্দিষ্ট একটি। প্রায়ই তানভীন।', ex:'<b>كِتَابٌ</b> — একটি বই' },
+        { tag:'مَعْرِفَة', h3:'মাʿরিফা · নির্দিষ্ট', p:'নির্দিষ্ট একটি — যেমন আগে <b style="font-family:Amiri">الْ</b>।', ex:'<b>الْكِتَابُ</b> — সেই বইটি' },
+      ],
+      quiz:{ prompt:'এই ইসমটি অনির্দিষ্ট না নির্দিষ্ট?', choices:[
+        { type:'nak', ar:'نَكِرَة', bn:'অনির্দিষ্ট' },{ type:'mar', ar:'مَعْرِفَة', bn:'নির্দিষ্ট' }],
+        words:[
+          { ar:'كِتَابٌ',     type:'nak', gloss:'একটি বই',   why:'তানভীন (<span class="ar">ٌ</span>) আছে, আল- নেই — অনির্দিষ্ট।' },
+          { ar:'الْكِتَابُ',  type:'mar', gloss:'সেই বইটি',   why:'আগে <span class="ar">الْ</span> (আল-) — নির্দিষ্ট।' },
+          { ar:'رَجُلٌ',      type:'nak', gloss:'একজন লোক',   why:'তানভীন আছে — অনির্দিষ্ট।' },
+          { ar:'الْمَسْجِدُ', type:'mar', gloss:'সেই মসজিদ',  why:'আগে <span class="ar">الْ</span> — নির্দিষ্ট।' },
+          { ar:'بَيْتٌ',      type:'nak', gloss:'একটি ঘর',    why:'তানভীন আছে — অনির্দিষ্ট।' },
+          { ar:'الْقَلَمُ',   type:'mar', gloss:'সেই কলমটি',  why:'আগে <span class="ar">الْ</span> — নির্দিষ্ট।' },
+          { ar:'مَدْرَسَةٌ',  type:'nak', gloss:'একটি মাদরাসা', why:'তানভীন আছে — অনির্দিষ্ট।' },
+          { ar:'الْوَلَدُ',   type:'mar', gloss:'সেই ছেলেটি', why:'আগে <span class="ar">الْ</span> — নির্দিষ্ট।' },
+        ] },
+    },
+    {
+      kicker:'৪ · মিশ্র অনুশীলন', title:'তিনটাই একসাথে',
+      sub:'একটি শব্দ দেখে তার সংখ্যা, লিঙ্গ ও নির্দিষ্টতা — তিনটাই বেছে নাও।',
+      hint:'তিনটি বৈশিষ্ট্যই বেছে নিয়ে মিলিয়ে দেখো।',
+      cards:[
+        { tag:'مُرَكَّب', h3:'সব একসাথে', p:'এক শব্দে সংখ্যা + লিঙ্গ + নির্দিষ্টতা — তিনটাই চিনে নাও।', ex:'<b>الْمُسْلِمَانِ</b> — দ্বিবচন · পুংলিঙ্গ · নির্দিষ্ট' },
+      ],
+      multi:true,
+      quiz:{
+        prompt:'এই শব্দটির তিনটি বৈশিষ্ট্যই বেছে নাও:',
+        axes:[
+          { label:'সংখ্যা', ar:'العدد', choices:[
+            { type:'mufrad', bn:'একবচন' },{ type:'muthanna', bn:'দ্বিবচন' },{ type:'jam', bn:'বহুবচন' }]},
+          { label:'লিঙ্গ', ar:'الجنس', choices:[
+            { type:'muz', bn:'পুংলিঙ্গ' },{ type:'mua', bn:'স্ত্রীলিঙ্গ' }]},
+          { label:'নির্দিষ্টতা', ar:'التعريف', choices:[
+            { type:'nak', bn:'অনির্দিষ্ট' },{ type:'mar', bn:'নির্দিষ্ট' }]},
+        ],
+        words:[
+          { ar:'الْمُسْلِمَانِ', gloss:'সেই দুই মুসলিম', ans:['muthanna','muz','mar'],
+            why:['শেষে <span class="ar">ـَانِ</span> (আন) — দ্বিবচন।','পুরুষবাচক, তা-মারবুতা নেই — পুংলিঙ্গ।','আগে <span class="ar">الْ</span> (আল-) — নির্দিষ্ট।'] },
+          { ar:'مُعَلِّمَةٌ', gloss:'একজন শিক্ষিকা', ans:['mufrad','mua','nak'],
+            why:['একটিমাত্র — একবচন।','শেষে <span class="ar">ة</span> (তা-মারবুতা) — স্ত্রীলিঙ্গ।','তানভীন (<span class="ar">ٌ</span>) আছে, আল- নেই — অনির্দিষ্ট।'] },
+          { ar:'الْمُؤْمِنُونَ', gloss:'সেই মুমিনগণ', ans:['jam','muz','mar'],
+            why:['শেষে <span class="ar">ـُونَ</span> (ঊন) — বহুবচন।','পুরুষবাচক — পুংলিঙ্গ।','আগে <span class="ar">الْ</span> — নির্দিষ্ট।'] },
+          { ar:'كِتَابٌ', gloss:'একটি বই', ans:['mufrad','muz','nak'],
+            why:['একটিমাত্র, কোনো লেজ নেই — একবচন।','পুরুষবাচক শব্দ — পুংলিঙ্গ।','তানভীন আছে, আল- নেই — অনির্দিষ্ট।'] },
+          { ar:'مُسْلِمَتَانِ', gloss:'দুই মুসলিমা', ans:['muthanna','mua','nak'],
+            why:['শেষে <span class="ar">ـَانِ</span> (আন) — দ্বিবচন।','মূলে <span class="ar">ة</span> আছে (মুসলিমা) — স্ত্রীলিঙ্গ।','আল- নেই — অনির্দিষ্ট।'] },
+          { ar:'الْقَلَمُ', gloss:'সেই কলমটি', ans:['mufrad','muz','mar'],
+            why:['একটিমাত্র — একবচন।','পুরুষবাচক শব্দ — পুংলিঙ্গ।','আগে <span class="ar">الْ</span> — নির্দিষ্ট।'] },
+          { ar:'صَالِحَاتٌ', gloss:'কিছু সৎ নারী', ans:['jam','mua','nak'],
+            why:['শেষে <span class="ar">ـَات</span> (আত) — বহুবচন।','<span class="ar">ـَات</span> স্ত্রীবাচক বহুবচন — স্ত্রীলিঙ্গ।','তানভীন আছে — অনির্দিষ্ট।'] },
+          { ar:'الْبِنْتُ', gloss:'সেই মেয়েটি', ans:['mufrad','mua','mar'],
+            why:['একটিমাত্র — একবচন।','অর্থেই স্ত্রীবাচক — স্ত্রীলিঙ্গ।','আগে <span class="ar">الْ</span> — নির্দিষ্ট।'] },
+        ],
+      },
+    },
+  ];
 
   /* ---------- fil page: 7-step guided lesson ---------- */
   const FIL_STEPS = [
@@ -1132,7 +1161,7 @@
     const N = steps.length;
 
     steps.forEach((s,i)=>{
-      const cardCls = s.cards.length>=3 ? (s.cards.length===4?'two':'three') : 'two';
+      const cardCls = s.cards.length===1 ? 'one' : (s.cards.length>=3 ? (s.cards.length===4?'two':'three') : 'two');
       const step = document.createElement('div');
       step.className = 'step';
       step.innerHTML = `
@@ -1149,7 +1178,8 @@
           <button class="step-next">${i===N-1?'সম্পন্ন ✓':'পরের ধাপ →'}</button>
         </div>`;
       host.appendChild(step);
-      makeQuiz(`quiz-${prefix}-${i}`, s.quiz);
+      if(s.multi) makeMultiQuiz(`quiz-${prefix}-${i}`, s.quiz);
+      else makeQuiz(`quiz-${prefix}-${i}`, s.quiz);
       const d = document.createElement('button');
       d.className='step-dot'; d.dataset.go=i; d.title=`ধাপ ${bn(i+1)}`;
       dots.appendChild(d);
@@ -1224,6 +1254,7 @@
     go(0);
     return go;
   }
+  const ismGo  = makeStepper({ prefix:'ism',  steps:ISM_STEPS,  summaryTitle:'ইসমের সব প্রকারভেদ — এক নজরে' });
   const filGo  = makeStepper({ prefix:'fil',  steps:FIL_STEPS,  summaryTitle:"ফি'লের সব প্রকারভেদ — এক নজরে" });
   const harfGo = makeStepper({ prefix:'harf', steps:HARF_STEPS, summaryTitle:'হরফের সব প্রকারভেদ — এক নজরে' });
 
@@ -1231,10 +1262,11 @@
   function show(id){
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    document.body.classList.toggle('ism-active',  id==='view-ism');
     document.body.classList.toggle('fil-active',  id==='view-fil');
     document.body.classList.toggle('harf-active', id==='view-harf');
     // close any open drawer when switching views
-    ['fil','harf'].forEach(p=>{
+    ['ism','fil','harf'].forEach(p=>{
       document.getElementById(`${p}-drawer`).classList.remove('open');
       document.getElementById(`${p}-backdrop`).classList.remove('open');
     });
@@ -1249,6 +1281,7 @@
   wireCard('ism-card',  'view-ism');
   wireCard('fil-card',  'view-fil');
   wireCard('harf-card', 'view-harf');
+  document.getElementById('ism-card').addEventListener('click', ()=>ismGo(0));
   document.getElementById('fil-card').addEventListener('click', ()=>filGo(0));
   document.getElementById('harf-card').addEventListener('click', ()=>harfGo(0));
   document.getElementById('ism-back').addEventListener('click', ()=>show('view-home'));
