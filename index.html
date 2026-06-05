@@ -270,7 +270,7 @@
     box-shadow:0 4px 14px -6px var(--shadow);
     transition:background .2s, transform .12s, opacity .2s;
   }
-  body.fil-active .burger { display:block; }
+  body.fil-active #fil-burger, body.harf-active #harf-burger { display:block; }
   .burger:hover { background:rgba(31,94,87,.08); transform:translateY(-1px); }
   /* hide burger while drawer is open so it doesn't cover the drawer heading */
   body.drawer-open .burger { opacity:0; pointer-events:none; }
@@ -394,12 +394,12 @@
         <div class="ex"><b>كَتَبَ</b> — লিখলো · <b>يَذْهَبُ</b> — যায়</div>
         <span class="more">প্রকারভেদ দেখো →</span>
       </div>
-      <div class="card static">
+      <div class="card clickable" id="harf-card" role="button" tabindex="0">
         <div class="tag">حَرْف</div>
         <h3>হরফ · অব্যয়</h3>
         <p>নিজের কোনো পূর্ণ অর্থ নেই; অন্য শব্দের সাথে মিলে অর্থ দেয়।</p>
         <div class="ex"><b>فِي</b> — ভিতরে · <b>مِنْ</b> — থেকে</div>
-        <span class="soon">প্রকারভেদ · শীঘ্রই</span>
+        <span class="more">প্রকারভেদ দেখো →</span>
       </div>
     </div>
 
@@ -497,6 +497,28 @@
     <div id="fil-summary" class="fil-summary"></div>
   </section>
 
+  <!-- ============ HARF VIEW ============ -->
+  <section class="view" id="view-harf">
+    <div class="fil-topbar">
+      <button class="back" id="harf-back">← কালিমার প্রকারে ফিরে যাও</button>
+    </div>
+    <header style="margin-bottom:8px">
+      <div class="eyebrow">أَقْسَامُ الْحَرْف</div>
+      <div class="ornament"><span>✦</span></div>
+      <h1>হরফ-এর প্রকারভেদ</h1>
+      <p class="sub">হরফ তার কাজ অনুযায়ী নানা দলে ভাগ। মনে রেখো — কিছু হরফ একাধিক দলেও থাকতে পারে।</p>
+    </header>
+
+    <div class="step-head">
+      <div class="step-count" id="harf-stepcount"></div>
+      <div class="step-bar"><i id="harf-stepfill"></i></div>
+      <div class="step-dots" id="harf-stepdots"></div>
+    </div>
+
+    <div id="harf-steps"></div>
+    <div id="harf-summary" class="fil-summary"></div>
+  </section>
+
   <footer>
     <span class="ar">طَلَبُ الْعِلْمِ فَرِيضَةٌ</span>
     জ্ঞান অন্বেষণ প্রতিটি মুসলিমের উপর ফরজ
@@ -511,6 +533,14 @@
   <div class="drawer-head">ফি'লের প্রকারভেদ</div>
   <div class="drawer-sub">যেকোনো ধাপে যেতে নাম বেছে নাও</div>
   <nav id="fil-drawer-list"></nav>
+</aside>
+
+<button class="burger" id="harf-burger" aria-label="মেনু">☰</button>
+<div class="drawer-backdrop" id="harf-backdrop"></div>
+<aside class="drawer" id="harf-drawer">
+  <div class="drawer-head">হরফের প্রকারভেদ</div>
+  <div class="drawer-sub">যেকোনো দলে যেতে নাম বেছে নাও</div>
+  <nav id="harf-drawer-list"></nav>
 </aside>
 
 <script>
@@ -942,16 +972,166 @@
     },
   ];
 
-  function renderFilSteps(){
-    const BN=['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
-    const bn = n => String(n).split('').map(d=>BN[+d]).join('');
-    const host = document.getElementById('fil-steps');
-    const dots = document.getElementById('fil-stepdots');
-    const fill = document.getElementById('fil-stepfill');
-    const count = document.getElementById('fil-stepcount');
-    const N = FIL_STEPS.length;
+  /* ---------- harf page: harf groups by function ---------- */
+  const YESNO = [{ type:'yes', ar:'✓', bn:'এই দলের' },{ type:'no', ar:'✗', bn:'অন্য দলের' }];
+  const HARF_STEPS = [
+    {
+      kicker:'১ · টানার হরফ', title:'হরফে জার',
+      sub:'পরের ইসমকে জার (যের) দেয়। আরও: عَنْ، عَلَى، بِ، لِ، كَ، حَتَّى।',
+      hint:'নিচের হরফটি কি হরফে জার?',
+      cards:[
+        { tag:'مِنْ', h3:'মিন · থেকে',  p:'সূচনা/স্থান বোঝায়।',  ex:'<b>مِنَ الْبَيْتِ</b> — ঘর থেকে' },
+        { tag:'إِلَى', h3:'ইলা · দিকে',  p:'গন্তব্য বোঝায়।',     ex:'<b>إِلَى الْمَسْجِدِ</b> — মসজিদের দিকে' },
+        { tag:'فِي',  h3:'ফী · ভিতরে',  p:'ভিতরে থাকা বোঝায়।',  ex:'<b>فِي الدَّارِ</b> — বাড়িতে' },
+      ],
+      quiz:{ prompt:'এই হরফটি কি হরফে জার?', choices:YESNO, words:[
+        { ar:'مِنْ', type:'yes', gloss:'থেকে',  why:'ইসমকে জার দেয় — হরফে জার।' },
+        { ar:'وَ',   type:'no',  gloss:'এবং',   why:'এটি সংযোগের হরফ (আতফ), জার নয়।' },
+        { ar:'عَلَى', type:'yes', gloss:'উপরে',  why:'ইসমকে জার দেয় — হরফে জার।' },
+        { ar:'هَلْ', type:'no',  gloss:'কি?',   why:'প্রশ্নের হরফ (ইস্তিফহাম), জার নয়।' },
+        { ar:'فِي',  type:'yes', gloss:'ভিতরে', why:'ইসমকে জার দেয় — হরফে জার।' },
+        { ar:'يَا',  type:'no',  gloss:'হে',    why:'সম্বোধনের হরফ (নিদা), জার নয়।' },
+      ] },
+    },
+    {
+      kicker:'২ · সংযোগের হরফ', title:'হরফে আতফ',
+      sub:'দুটি শব্দ বা বাক্যকে যুক্ত করে। আরও: أَوْ، بَلْ।',
+      hint:'এই হরফটি কি হরফে আতফ?',
+      cards:[
+        { tag:'وَ',   h3:'ওয়াও · এবং',  p:'একসাথে যোগ করে।',      ex:'<b>زَيْدٌ وَعَمْرٌو</b> — যায়েদ ও আমর' },
+        { tag:'فَ',   h3:'ফা · অতঃপর',  p:'ক্রমে, সাথে সাথে।',    ex:'<b>دَخَلَ فَجَلَسَ</b> — ঢুকে বসল' },
+        { tag:'ثُمَّ', h3:'সুম্মা · তারপর', p:'দেরিতে, ক্রমানুসারে।', ex:'<b>...ثُمَّ...</b> — তারপর' },
+      ],
+      quiz:{ prompt:'এই হরফটি কি হরফে আতফ?', choices:YESNO, words:[
+        { ar:'وَ',   type:'yes', gloss:'এবং',   why:'দুটি শব্দ যুক্ত করে — হরফে আতফ।' },
+        { ar:'مِنْ', type:'no',  gloss:'থেকে',  why:'এটি জার-এর হরফ, আতফ নয়।' },
+        { ar:'ثُمَّ', type:'yes', gloss:'তারপর', why:'ক্রমে যুক্ত করে — হরফে আতফ।' },
+        { ar:'هَلْ', type:'no',  gloss:'কি?',   why:'প্রশ্নের হরফ, আতফ নয়।' },
+        { ar:'أَوْ', type:'yes', gloss:'অথবা',  why:'বিকল্প যুক্ত করে — হরফে আতফ।' },
+        { ar:'لَمْ', type:'no',  gloss:'করেনি', why:'জযম-এর হরফ, আতফ নয়।' },
+      ] },
+    },
+    {
+      kicker:'৩ · নসবদানকারী হরফ', title:'হরফে নসব',
+      sub:'মুদারিʿ ফি\'লকে নসব (যবর) দেয়।',
+      hint:'এই হরফটি কি মুদারিʿকে নসব দেয়?',
+      cards:[
+        { tag:'أَنْ', h3:'আন · যে / করতে', p:'মুদারিʿকে নসব দেয়।', ex:'<b>أَنْ يَكْتُبَ</b> — যে সে লিখবে' },
+        { tag:'لَنْ', h3:'লান · কখনো না',  p:'ভবিষ্যৎ নিষেধ + নসব।', ex:'<b>لَنْ يَذْهَبَ</b> — কখনো যাবে না' },
+        { tag:'كَيْ', h3:'কাই · যাতে',     p:'উদ্দেশ্য + নসব।',     ex:'<b>كَيْ يَنْجَحَ</b> — যাতে সফল হয়' },
+      ],
+      quiz:{ prompt:'এই হরফটি কি হরফে নসব?', choices:YESNO, words:[
+        { ar:'أَنْ', type:'yes', gloss:'যে',     why:'মুদারিʿকে নসব দেয় — হরফে নসব।' },
+        { ar:'لَنْ', type:'yes', gloss:'কখনো না', why:'মুদারিʿকে নসব দেয় — হরফে নসব।' },
+        { ar:'لَمْ', type:'no',  gloss:'করেনি',  why:'এটি জযম-এর হরফ, নসবের নয়।' },
+        { ar:'كَيْ', type:'yes', gloss:'যাতে',   why:'মুদারিʿকে নসব দেয় — হরফে নসব।' },
+        { ar:'مِنْ', type:'no',  gloss:'থেকে',   why:'জার-এর হরফ, নসবের নয়।' },
+        { ar:'هَلْ', type:'no',  gloss:'কি?',    why:'প্রশ্নের হরফ, নসবের নয়।' },
+      ] },
+    },
+    {
+      kicker:'৪ · জযমদানকারী হরফ', title:'হরফে জযম',
+      sub:'মুদারিʿ ফি\'লকে জযম (সুকুন) দেয়।',
+      hint:'এই হরফটি কি মুদারিʿকে জযম দেয়?',
+      cards:[
+        { tag:'لَمْ',  h3:'লাম · করেনি',     p:'অতীত নিষেধ + জযম।',   ex:'<b>لَمْ يَكْتُبْ</b> — সে লেখেনি' },
+        { tag:'لَمَّا', h3:'লাম্মা · এখনো না', p:'এখনো হয়নি + জযম।',    ex:'<b>لَمَّا يَذْهَبْ</b> — এখনো যায়নি' },
+        { tag:'لَا',   h3:'লা নাহিয়া · করো না', p:'নিষেধাজ্ঞা + জযম।',  ex:'<b>لَا تَكْذِبْ</b> — মিথ্যা বলো না' },
+      ],
+      quiz:{ prompt:'এই হরফটি কি হরফে জযম?', choices:YESNO, words:[
+        { ar:'لَمْ',  type:'yes', gloss:'করেনি',  why:'মুদারিʿকে জযম দেয় — হরফে জযম।' },
+        { ar:'لَنْ',  type:'no',  gloss:'কখনো না', why:'এটি নসব-এর হরফ, জযমের নয়।' },
+        { ar:'لَمَّا', type:'yes', gloss:'এখনো না', why:'মুদারিʿকে জযম দেয় — হরফে জযম।' },
+        { ar:'إِلَى', type:'no',  gloss:'দিকে',   why:'জার-এর হরফ, জযমের নয়।' },
+        { ar:'لَا',   type:'yes', gloss:'করো না', why:'নাহিয়া — মুদারিʿকে জযম দেয়, হরফে জযম।' },
+        { ar:'وَ',    type:'no',  gloss:'এবং',    why:'আতফ-এর হরফ, জযমের নয়।' },
+      ] },
+    },
+    {
+      kicker:'৫ · ইন্না ও তার বোনেরা', title:'হুরূফ মুশাব্বাহা',
+      sub:'ইসমকে নসব, খবরকে রফা দেয়; অর্থে জোর/আকাঙ্ক্ষা যোগ করে।',
+      hint:'এই হরফটি কি ইন্না-জাতীয় (মুশাব্বাহা)?',
+      cards:[
+        { tag:'إِنَّ',   h3:'ইন্না · নিশ্চয়ই',  p:'জোর দেয়।',        ex:'<b>إِنَّ اللهَ ...</b> — নিশ্চয়ই আল্লাহ' },
+        { tag:'كَأَنَّ',  h3:'কাআন্না · যেন',    p:'সাদৃশ্য বোঝায়।',  ex:'<b>كَأَنَّهُ أَسَدٌ</b> — সে যেন সিংহ' },
+        { tag:'لَعَلَّ', h3:'লাআল্লা · সম্ভবত', p:'আশা/আকাঙ্ক্ষা।',  ex:'<b>لَعَلَّهُ يَنْجَحُ</b> — হয়তো সফল হবে' },
+      ],
+      quiz:{ prompt:'এই হরফটি কি ইন্না-জাতীয়?', choices:YESNO, words:[
+        { ar:'إِنَّ',   type:'yes', gloss:'নিশ্চয়ই', why:'ইসম নসব, খবর রফা — মুশাব্বাহা।' },
+        { ar:'كَأَنَّ',  type:'yes', gloss:'যেন',    why:'ইন্না-জাতীয় (সাদৃশ্য) — মুশাব্বাহা।' },
+        { ar:'وَ',     type:'no',  gloss:'এবং',    why:'আতফ-এর হরফ, ইন্না-জাতীয় নয়।' },
+        { ar:'لَعَلَّ', type:'yes', gloss:'আশা করি', why:'ইন্না-জাতীয় (আশা) — মুশাব্বাহা।' },
+        { ar:'مِنْ',   type:'no',  gloss:'থেকে',   why:'জার-এর হরফ, ইন্না-জাতীয় নয়।' },
+        { ar:'هَلْ',   type:'no',  gloss:'কি?',    why:'প্রশ্নের হরফ, ইন্না-জাতীয় নয়।' },
+      ] },
+    },
+    {
+      kicker:'৬ · প্রশ্নের হরফ', title:'হরফে ইস্তিফহাম',
+      sub:'প্রশ্ন করার জন্য ব্যবহৃত হয়।',
+      hint:'এই হরফটি কি প্রশ্নের হরফ?',
+      cards:[
+        { tag:'هَلْ', h3:'হাল · কি?', p:'হ্যাঁ/না প্রশ্ন করে।', ex:'<b>هَلْ نَجَحْتَ؟</b> — তুমি কি সফল হয়েছ?' },
+        { tag:'أَ',   h3:'হামজা · কি?', p:'প্রশ্নবোধক হামজা।',   ex:'<b>أَأَنْتَ زَيْدٌ؟</b> — তুমি কি যায়েদ?' },
+      ],
+      quiz:{ prompt:'এই হরফটি কি প্রশ্নের হরফ?', choices:YESNO, words:[
+        { ar:'هَلْ', type:'yes', gloss:'কি?',   why:'প্রশ্ন করে — হরফে ইস্তিফহাম।' },
+        { ar:'مِنْ', type:'no',  gloss:'থেকে',  why:'জার-এর হরফ, প্রশ্নের নয়।' },
+        { ar:'أَ',   type:'yes', gloss:'কি?',   why:'প্রশ্নবোধক হামজা — হরফে ইস্তিফহাম।' },
+        { ar:'وَ',   type:'no',  gloss:'এবং',   why:'আতফ-এর হরফ, প্রশ্নের নয়।' },
+        { ar:'يَا',  type:'no',  gloss:'হে',    why:'সম্বোধনের হরফ, প্রশ্নের নয়।' },
+        { ar:'إِنَّ', type:'no',  gloss:'নিশ্চয়ই', why:'ইন্না-জাতীয়, প্রশ্নের নয়।' },
+      ] },
+    },
+    {
+      kicker:'৭ · সম্বোধনের হরফ', title:'হরফে নিদা',
+      sub:'কাউকে ডাকা বা সম্বোধনের জন্য।',
+      hint:'এই হরফটি কি সম্বোধনের হরফ?',
+      cards:[
+        { tag:'يَا',  h3:'ইয়া · হে',   p:'সবচেয়ে প্রচলিত নিদা।',  ex:'<b>يَا اللهُ</b> — হে আল্লাহ' },
+        { tag:'أَيَا', h3:'আইয়া · ওহে', p:'দূরের কাউকে ডাকা।',     ex:'<b>أَيَا زَيْدُ</b> — ওহে যায়েদ' },
+        { tag:'أَيْ',  h3:'আই · এই যে',  p:'কাছের কাউকে ডাকা।',     ex:'<b>أَيْ بُنَيَّ</b> — হে বৎস' },
+      ],
+      quiz:{ prompt:'এই হরফটি কি সম্বোধনের হরফ?', choices:YESNO, words:[
+        { ar:'يَا',  type:'yes', gloss:'হে',    why:'সম্বোধন করে — হরফে নিদা।' },
+        { ar:'هَلْ', type:'no',  gloss:'কি?',   why:'প্রশ্নের হরফ, নিদা নয়।' },
+        { ar:'أَيَا', type:'yes', gloss:'ওহে',  why:'দূরের সম্বোধন — হরফে নিদা।' },
+        { ar:'مِنْ', type:'no',  gloss:'থেকে',  why:'জার-এর হরফ, নিদা নয়।' },
+        { ar:'أَيْ',  type:'yes', gloss:'এই যে', why:'কাছের সম্বোধন — হরফে নিদা।' },
+        { ar:'فَ',   type:'no',  gloss:'অতঃপর', why:'আতফ-এর হরফ, নিদা নয়।' },
+      ] },
+    },
+    {
+      kicker:'৮ · উত্তরের হরফ', title:'হরফে জাওয়াব',
+      sub:'প্রশ্নের উত্তর — হ্যাঁ বা না বোঝাতে।',
+      hint:'এই হরফটি কি উত্তরের হরফ?',
+      cards:[
+        { tag:'نَعَمْ', h3:'নাআম · হ্যাঁ',     p:'ইতিবাচক উত্তর।',         ex:'<b>نَعَمْ</b> — হ্যাঁ' },
+        { tag:'بَلَىٰ', h3:'বালা · হ্যাঁ',      p:'নেতিবাচক প্রশ্নের হ্যাঁ।', ex:'<b>أَلَسْتَ؟ بَلَى</b> — তুমি নও কি? হ্যাঁ আছি' },
+        { tag:'كَلَّا', h3:'কাল্লা · কখনো নয়', p:'জোরালো প্রত্যাখ্যান।',    ex:'<b>كَلَّا</b> — কখনো নয়' },
+      ],
+      quiz:{ prompt:'এই হরফটি কি উত্তরের হরফ?', choices:YESNO, words:[
+        { ar:'نَعَمْ', type:'yes', gloss:'হ্যাঁ',  why:'প্রশ্নের উত্তর দেয় — হরফে জাওয়াব।' },
+        { ar:'هَلْ',  type:'no',  gloss:'কি?',   why:'প্রশ্নের হরফ, উত্তরের নয়।' },
+        { ar:'بَلَى', type:'yes', gloss:'হ্যাঁ',  why:'নেতিবাচক প্রশ্নের উত্তর — হরফে জাওয়াব।' },
+        { ar:'مِنْ',  type:'no',  gloss:'থেকে',  why:'জার-এর হরফ, উত্তরের নয়।' },
+        { ar:'كَلَّا', type:'yes', gloss:'কখনো নয়', why:'প্রত্যাখ্যানের উত্তর — হরফে জাওয়াব।' },
+        { ar:'يَا',   type:'no',  gloss:'হে',    why:'সম্বোধনের হরফ, উত্তরের নয়।' },
+      ] },
+    },
+  ];
 
-    FIL_STEPS.forEach((s,i)=>{
+  const BN_NUM=['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+  const bn = n => String(n).split('').map(d=>BN_NUM[+d]).join('');
+
+  function makeStepper(cfg){
+    const { prefix, steps, summaryTitle } = cfg;
+    const host  = document.getElementById(`${prefix}-steps`);
+    const dots  = document.getElementById(`${prefix}-stepdots`);
+    const fill  = document.getElementById(`${prefix}-stepfill`);
+    const count = document.getElementById(`${prefix}-stepcount`);
+    const N = steps.length;
+
+    steps.forEach((s,i)=>{
       const cardCls = s.cards.length>=3 ? (s.cards.length===4?'two':'three') : 'two';
       const step = document.createElement('div');
       step.className = 'step';
@@ -963,25 +1143,25 @@
           ${s.cards.map(c=>`<div class="card static"><div class="tag">${c.tag}</div><h3>${c.h3}</h3><p>${c.p}</p><div class="ex">${c.ex}</div></div>`).join('')}
         </div>
         <p class="sub" style="text-align:center;margin:22px 0 -6px">↓ ${s.hint}</p>
-        <div class="quiz" id="quiz-fil-${i}"></div>
+        <div class="quiz" id="quiz-${prefix}-${i}"></div>
         <div class="step-nav">
           <button class="step-prev"${i===0?' disabled':''}>← আগের ধাপ</button>
           <button class="step-next">${i===N-1?'সম্পন্ন ✓':'পরের ধাপ →'}</button>
         </div>`;
       host.appendChild(step);
-      makeQuiz(`quiz-fil-${i}`, s.quiz);
+      makeQuiz(`quiz-${prefix}-${i}`, s.quiz);
       const d = document.createElement('button');
       d.className='step-dot'; d.dataset.go=i; d.title=`ধাপ ${bn(i+1)}`;
       dots.appendChild(d);
     });
 
     // build recap summary
-    const summary = document.getElementById('fil-summary');
+    const summary = document.getElementById(`${prefix}-summary`);
     summary.innerHTML = `
       <div class="section-label" style="margin-top:6px">✦ সম্পন্ন ✦</div>
-      <h2 class="step-title">ফি'লের সব প্রকারভেদ — এক নজরে</h2>
-      <p class="sub" style="text-align:center;margin:6px 0 26px">মাশাআল্লাহ! তুমি সাতটি ধাপই শেষ করেছ।</p>
-      ${FIL_STEPS.map((s,i)=>`
+      <h2 class="step-title">${summaryTitle}</h2>
+      <p class="sub" style="text-align:center;margin:6px 0 26px">মাশাআল্লাহ! তুমি ${bn(N)}টি ধাপই শেষ করেছ।</p>
+      ${steps.map((s,i)=>`
         <div class="recap-row clickable" data-go="${i}">
           <div class="recap-kicker">${s.kicker} &nbsp;→</div>
           <div class="recap-types">
@@ -989,21 +1169,21 @@
           </div>
         </div>`).join('')}
       <div class="step-nav" style="margin-top:26px">
-        <button class="step-prev" id="fil-sum-restart">↺ আবার শুরু</button>
-        <button class="step-next" id="fil-sum-home">🏠 কালিমায় ফিরে যাও</button>
+        <button class="step-prev" id="${prefix}-sum-restart">↺ আবার শুরু</button>
+        <button class="step-next" id="${prefix}-sum-home">🏠 কালিমায় ফিরে যাও</button>
       </div>`;
 
     // build drawer (burger menu) list — sections + summary
-    const drawerList = document.getElementById('fil-drawer-list');
-    drawerList.innerHTML = FIL_STEPS.map((s,i)=>
+    const drawerList = document.getElementById(`${prefix}-drawer-list`);
+    drawerList.innerHTML = steps.map((s,i)=>
       `<button class="drawer-item" data-go="${i}"><span class="di-kicker">${s.kicker}</span><span class="di-title">${s.title}</span></button>`
     ).join('') + `<button class="drawer-item" data-go="${N}"><span class="di-kicker">✦ শেষ</span><span class="di-title">সব প্রকার — এক নজরে</span></button>`;
     const drawerItems=[...drawerList.querySelectorAll('.drawer-item')];
 
-    const drawer=document.getElementById('fil-drawer');
-    const backdrop=document.getElementById('fil-backdrop');
+    const drawer=document.getElementById(`${prefix}-drawer`);
+    const backdrop=document.getElementById(`${prefix}-backdrop`);
     function closeDrawer(){ drawer.classList.remove('open'); backdrop.classList.remove('open'); document.body.classList.remove('drawer-open'); }
-    document.getElementById('fil-burger').addEventListener('click', ()=>{ drawer.classList.add('open'); backdrop.classList.add('open'); document.body.classList.add('drawer-open'); });
+    document.getElementById(`${prefix}-burger`).addEventListener('click', ()=>{ drawer.classList.add('open'); backdrop.classList.add('open'); document.body.classList.add('drawer-open'); });
     backdrop.addEventListener('click', closeDrawer);
 
     const stepEls=[...host.querySelectorAll('.step')];
@@ -1039,23 +1219,26 @@
     dots.addEventListener('click', e=>{ const b=e.target.closest('.step-dot'); if(b) go(+b.dataset.go); });
     drawerList.addEventListener('click', e=>{ const b=e.target.closest('.drawer-item'); if(b){ go(+b.dataset.go); closeDrawer(); } });
     summary.addEventListener('click', e=>{ const r=e.target.closest('.recap-row'); if(r){ go(+r.dataset.go); } });
-    summary.querySelector('#fil-sum-restart').addEventListener('click', ()=>go(0));
-    summary.querySelector('#fil-sum-home').addEventListener('click', ()=>show('view-home'));
+    summary.querySelector(`#${prefix}-sum-restart`).addEventListener('click', ()=>go(0));
+    summary.querySelector(`#${prefix}-sum-home`).addEventListener('click', ()=>show('view-home'));
     go(0);
     return go;
   }
-  const filGo = renderFilSteps();
+  const filGo  = makeStepper({ prefix:'fil',  steps:FIL_STEPS,  summaryTitle:"ফি'লের সব প্রকারভেদ — এক নজরে" });
+  const harfGo = makeStepper({ prefix:'harf', steps:HARF_STEPS, summaryTitle:'হরফের সব প্রকারভেদ — এক নজরে' });
 
   /* ---------- view navigation ---------- */
   function show(id){
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    document.body.classList.toggle('fil-active', id==='view-fil');
-    if(id!=='view-fil'){
-      document.getElementById('fil-drawer').classList.remove('open');
-      document.getElementById('fil-backdrop').classList.remove('open');
-      document.body.classList.remove('drawer-open');
-    }
+    document.body.classList.toggle('fil-active',  id==='view-fil');
+    document.body.classList.toggle('harf-active', id==='view-harf');
+    // close any open drawer when switching views
+    ['fil','harf'].forEach(p=>{
+      document.getElementById(`${p}-drawer`).classList.remove('open');
+      document.getElementById(`${p}-backdrop`).classList.remove('open');
+    });
+    document.body.classList.remove('drawer-open');
     window.scrollTo({ top:0, behavior:'smooth' });
   }
   function wireCard(cardId, viewId){
@@ -1063,11 +1246,14 @@
     card.addEventListener('click', ()=>show(viewId));
     card.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); show(viewId); } });
   }
-  wireCard('ism-card', 'view-ism');
-  wireCard('fil-card', 'view-fil');
+  wireCard('ism-card',  'view-ism');
+  wireCard('fil-card',  'view-fil');
+  wireCard('harf-card', 'view-harf');
   document.getElementById('fil-card').addEventListener('click', ()=>filGo(0));
+  document.getElementById('harf-card').addEventListener('click', ()=>harfGo(0));
   document.getElementById('ism-back').addEventListener('click', ()=>show('view-home'));
   document.getElementById('fil-back').addEventListener('click', ()=>show('view-home'));
+  document.getElementById('harf-back').addEventListener('click', ()=>show('view-home'));
 </script>
 </body>
 </html>
