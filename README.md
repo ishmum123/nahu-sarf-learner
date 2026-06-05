@@ -13,9 +13,10 @@ into its **own nested stepper page**, as deep as the grammar goes.
 ```
 Home (kalimah quiz)
   ├─ ism  ──▶ stepper ──▶ muʿrab ──▶ marfuʿ · mansub · majrur
+  │                  ├──▶ maʿrifah (damir · mawsul · ishara) · mabni
   │                  └──▶ mushtaqq · ghayr-munsarif
-  ├─ fiʿl ──▶ stepper ──▶ ṣigha · iʿrab (muḍariʿ) · bab-wazn · muʿtall
-  └─ harf ──▶ stepper      (grouped by function)
+  ├─ fiʿl ──▶ stepper ──▶ ṣigha · iʿrab (muḍariʿ) · bab-wazn · muʿtall · nawasikh
+  └─ harf ──▶ stepper ──▶ jarr · ʿatf · mushabbahah (inna & sisters)
 ```
 
 ---
@@ -67,12 +68,18 @@ data/
   ism.js fil.js harf.js     top-level pages  (ISM_STEPS / FIL_STEPS / HARF_STEPS + PAGES[...] )
   murab.js                  ism → muʿrab drill-down (states + signs of iʿrab)
   murab-states.js           muʿrab → marfuʿ / mansub / majrur (each closes with tawabiʿ)
+  marifah.js                ism → maʿrifah depth (damir · mawsul · ishara)
+  mabni.js                  ism → mabni isms + bina states (damm/fath/kasr/sukun)
   mushtaqq.js               ism → derived-noun types
   ghayr-munsarif.js         ism → diptote causes (asbab al-manʿ)
   fil-murab.js              fiʿl → iʿrab of the muḍariʿ (marfuʿ/mansub/majzum)
   sigha.js                  fiʿl → the 14 ṣigha (gardan)
   mazid.js                  fiʿl → bab & wazn (mujarrad / mazid)
   mutall.js                 fiʿl → sound & weak verbs
+  nawasikh.js               fiʿl → special classes (nakisah · muqarabah · qulub · madh-dhamm)
+  harf-jarr.js              harf → ḥuruf al-jarr (meanings + full list)
+  harf-atf.js               harf → ḥuruf al-ʿatf (meaning nuances)
+  harf-mushabbahah.js       harf → inna & sisters (meaning + amal)
 app.js            home quiz + boot: buildPages(), wire home cards, show(null)
 docs/
   grammar-map.md            the conclusive taxonomy (reference — incl. unbuilt nodes)
@@ -123,48 +130,16 @@ unseen steps cost nothing.
 
 ## Grammar map
 
-Legend:  **✓** own nested stepper page · **☐** planned · *(unmarked)* taught as
-cards/steps on its parent.  The full taxonomy — every node, built or not — lives in
-[`docs/grammar-map.md`](docs/grammar-map.md); below is what the app teaches **today**.
+Every Arabic word is **ism**, **fiʿl**, or **harf**, and each branches into its own
+sub-classifications — ism by number, gender, definiteness, derivation, and iʿrab
+(→ muʿrab → marfuʿ · mansub · majrur, plus mabni, maʿrifah, mushtaqq, ghayr-munsarif);
+fiʿl by tense, ṣigha, bab-wazn, soundness, iʿrab, and the special nawasikh; harf by
+function (jarr · ʿatf · mushabbahah, and more). The app mirrors this tree directly in its
+nested pages and breadcrumbs (`kalimah › ism › muʿrab › marfuʿ`).
 
-```
-الكلمة  Kalimah — every Arabic word is one of:
-│
-├─ ISM ✓
-│   ├─ number .......... mufrad · muthanna · jamʿ
-│   ├─ gender .......... mudhakkar · muʾannath
-│   ├─ definiteness .... nakirah · maʿrifah (damir · ʿalam · isharah · mawsul · bi-al · mudaf · munada)
-│   ├─ derivation ...... jamid · mushtaqq ✓ (faʿil · mafʿul · sifah mushabbahah · tafdil · mubalagha · zaman/makan · alah)
-│   ├─ tanwin .......... munsarif · ghayr munsarif ✓ (asbab al-manʿ)
-│   ├─ ending .......... sahih · maqsur · manqus · mamdud
-│   └─ iʿrab ........... mabni · muʿrab ✓
-│         MUʿRAB ✓  — states + signs (harakat · huruf · muqaddar)
-│           ├─ marfuʿ ✓ ── faʿil · naʾib · mubtada · khabar · ism kana · khabar inna
-│           ├─ mansub ✓ ── mafʿul ×5 · hal · tamyiz · mustathna · khabar kana · ism inna · munada
-│           └─ majrur ✓ ── bi-harf al-jarr · mudaf ilayh
-│              · tawabiʿ (naʿt · maʿtuf · taʾkid · badal) — taught in all three states
-│
-├─ FIʿL ✓
-│   ├─ tense ........... madi · mudariʿ · amr
-│   ├─ ṣigha ✓ ......... the 14 amthila / gardan  (person × number × gender)
-│   ├─ transitivity .... lazim · mutaʿaddi
-│   ├─ voice ........... maʿlum · majhul
-│   ├─ bab & wazn ✓ .... mujarrad (6 abwab) · mazid (awzan)
-│   ├─ soundness ✓ ..... sahih (salim · mahmuz · mudaʿʿaf) · muʿtall (mithal · ajwaf · naqis · lafif)
-│   ├─ conjugability ... mutasarrif · jamid
-│   ├─ iʿrab muḍariʿ ✓ . marfuʿ · mansub · majzum  (nawasib · jawazim)
-│   └─ special classes . nakisah ☐ · muqarabah · qulub · madh-wa-dhamm
-│
-└─ HARF ✓ — grouped by function
-    ├─ jar · ʿatf · nasb · jazm
-    ├─ mushabbahah (inna & sisters) · istifham
-    └─ nida · jawab
-```
-
-**Built:** ism · fiʿl · harf; ism → muʿrab → marfuʿ / mansub / majrur (each closing
-with tawabiʿ); ism → mushtaqq, ghayr-munsarif; fiʿl → ṣigha, iʿrab (muḍariʿ), bab-wazn,
-muʿtall — **13 stepper pages, 64 steps.** Deeper ☐ nodes (maʿrifah's damir/mawsul, the
-fiʿl nawasikh, harf's finer groups) follow the same one-data-entry + one-`link:` recipe.
+The complete classification — every node, whether the app drills it into its own page or
+teaches it inline — is the single source of truth in
+[`docs/grammar-map.md`](docs/grammar-map.md).
 
 ---
 

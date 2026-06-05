@@ -2,7 +2,7 @@
 
 The complete classification tree of Arabic **nahw** and **sarf**, as far down as the
 grammar genuinely branches. This is the *reference territory* — the app
-(`../README.md`) teaches a beginner subset of it and marks which nodes are built.
+(`../README.md`) teaches a beginner subset of it.
 
 ---
 
@@ -150,7 +150,8 @@ sciences stop.
 ## Relation to the app
 
 The app does not march a beginner through this whole tree. It teaches the
-recognition-level core — the top axes of each word-type plus the iʿrāb states — and
-leaves the deep tail (awzān tables, asbāb al-manʿ, the muʿtall and mushtaqq subtypes,
-…) as reference. See `../README.md` for what is currently built and the
-nested-page recipe for extending into any ☐ node here.
+recognition-level core — the top axes of each word-type, the iʿrāb states, and the main
+sub-classes (mushtaqq, muʿtall, asbāb al-manʿ, the nawāsikh, the ḥarf groups) — and
+leaves the deepest tail (full ṣarf/awzān conjugation tables, jamʿ-taksir patterns, the
+signs-of-iʿrāb detail, afʿāl al-taʿajjub, …) as reference. See `../README.md` for exactly
+what is built and the nested-page recipe for extending into any node not yet built.
